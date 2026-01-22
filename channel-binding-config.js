@@ -924,26 +924,26 @@
         // Render card types
         cardTypeList.innerHTML = '';
         
-        // First row: "全部" (All) option
+        // First row: "全部" (All) option - READ ONLY
         const allRow = document.createElement('div');
         allRow.className = 'card-type-row';
         allRow.innerHTML = `
-            <label class="card-type-checkbox-label">
-                <input type="checkbox" name="cardType" value="全部" checked onchange="handleAllCardTypeChange()">
+            <label class="card-type-checkbox-label read-only">
+                <input type="checkbox" name="cardType" value="全部" checked disabled readonly>
                 <span>全部</span>
             </label>
         `;
         cardTypeList.appendChild(allRow);
 
-        // Second row: Other card types
+        // Second row: Other card types - READ ONLY
         const otherRow = document.createElement('div');
         otherRow.className = 'card-type-row';
         
         cardTypes.filter(type => type !== '全部').forEach(cardType => {
             const label = document.createElement('label');
-            label.className = 'card-type-checkbox-label';
+            label.className = 'card-type-checkbox-label read-only';
             label.innerHTML = `
-                <input type="checkbox" name="cardType" value="${cardType}" checked onchange="handleCardTypeChange()">
+                <input type="checkbox" name="cardType" value="${cardType}" checked disabled readonly>
                 <span>${cardType}</span>
             `;
             otherRow.appendChild(label);
@@ -1087,20 +1087,20 @@
         // Render currencies
         currencyList.innerHTML = '';
         
-        // First row: "全部" (All) option
+        // First row: "全部" (All) option - READ ONLY
         const allRow = document.createElement('div');
         allRow.className = 'currency-row';
         allRow.innerHTML = `
             <div class="currency-item">
-                <label class="currency-checkbox-label">
-                    <input type="checkbox" name="currency" value="全部" checked onchange="handleAllCurrencyChange()">
+                <label class="currency-checkbox-label read-only">
+                    <input type="checkbox" name="currency" value="全部" checked disabled readonly>
                     <span>全部</span>
                 </label>
             </div>
         `;
         currencyList.appendChild(allRow);
 
-        // Second row: Other currencies
+        // Second row: Other currencies - READ ONLY
         const otherRow = document.createElement('div');
         otherRow.className = 'currency-row';
         
@@ -1111,14 +1111,14 @@
             if (currencyCode === '全部') return; // Skip if "全部" is in the list
             
             const item = document.createElement('div');
-            item.className = 'currency-item';
+            item.className = 'currency-item read-only';
             item.innerHTML = `
-                <label class="currency-checkbox-label">
-                    <input type="checkbox" name="currency" value="${currencyCode}" checked onchange="handleCurrencyChange()">
+                <label class="currency-checkbox-label read-only">
+                    <input type="checkbox" name="currency" value="${currencyCode}" checked disabled readonly>
                     <span>${currencyLabel || currencyCode}</span>
                 </label>
-                <label class="currency-default-label">
-                    <input type="radio" name="currencyDefault" value="${currencyCode}" onchange="handleCurrencyDefaultChange()">
+                <label class="currency-default-label read-only">
+                    <input type="radio" name="currencyDefault" value="${currencyCode}" disabled readonly>
                     <span>是否默认</span>
                 </label>
             `;
@@ -2019,32 +2019,19 @@
             const response = await submitConfiguration(formData);
             
             if (response.success) {
-                showMessage('渠道配置成功！正在验证配置...', 'success');
-                
-                // Show connection test (form stays visible)
-                showConnectionTest();
-                
-                // Mock connection test with loading
-                await mockConnectionTest();
-                
-                // Auto-validate configuration
-                setTimeout(async () => {
-                    const validationResult = await validateConfiguration(response.configId);
-                    if (validationResult.success) {
-                        showMessage('配置验证成功！渠道已成功绑定。', 'success');
-                        // Don't navigate away - keep form visible with success message
-                        // The connection test status already shows success, so just keep everything visible
-                    } else {
-                        showMessage('配置验证失败：' + validationResult.message, 'error');
+                showMessage('渠道配置成功！', 'success');
+                // Hide form and show summary after successful configuration
+                setTimeout(() => {
+                    if (typeof hideAddNewForm === 'function') {
+                        hideAddNewForm();
                     }
-                }, 2000);
+                }, 1500);
             } else {
                 showMessage('配置失败：' + response.message, 'error');
             }
         } catch (error) {
             console.error('Configuration error:', error);
             showMessage('配置过程中发生错误，请稍后重试。', 'error');
-            hideConnectionTest();
         }
     }
 
@@ -2054,14 +2041,33 @@
         const iconEl = document.getElementById('connectionTestIcon');
         const textEl = document.getElementById('connectionTestText');
         
+        console.log('[Connection Test] showConnectionTest called', { statusEl: !!statusEl, iconEl: !!iconEl, textEl: !!textEl });
+        
         if (statusEl && iconEl && textEl) {
             statusEl.style.display = 'block';
+            statusEl.style.visibility = 'visible';
+            statusEl.style.opacity = '1';
             // Use a spinning loader icon (circular arrow)
             iconEl.innerHTML = '⟳';
             iconEl.className = 'connection-test-icon loading';
             textEl.textContent = '正在测试连接...';
+            
+            // Force a reflow to ensure display change is applied
+            void statusEl.offsetHeight;
+            
+            // Scroll into view to ensure it's visible
+            setTimeout(() => {
+                statusEl.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'nearest' });
+            }, 50);
+            
+            console.log('[Connection Test] Status shown, display:', statusEl.style.display, 'visibility:', statusEl.style.visibility);
+        } else {
+            console.error('[Connection Test] Missing elements:', { statusEl: !!statusEl, iconEl: !!iconEl, textEl: !!textEl });
         }
     }
+
+    // Make functions globally accessible
+    window.showConnectionTest = showConnectionTest;
 
     // Mock connection test with loading animation
     async function mockConnectionTest() {
@@ -2102,6 +2108,10 @@
             statusEl.style.display = 'none';
         }
     }
+
+    // Make functions globally accessible
+    window.hideConnectionTest = hideConnectionTest;
+    window.mockConnectionTest = mockConnectionTest;
 
     // Backend API Integration
     async function submitConfiguration(data) {

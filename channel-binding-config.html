@@ -189,8 +189,100 @@
 
         <!-- Tab 1: Channel Binding -->
         <div class="tab-content active" id="channel-binding-tab">
-        <!-- Configuration Form Card -->
-        <div class="config-card" id="configFormCard">
+        
+        <!-- Summary Section: List of Configured Channels -->
+        <div class="summary-section" id="summarySection">
+            <!-- Filter Controls -->
+            <div class="filter-container">
+                <div class="filter-controls">
+                    <div class="filter-group">
+                        <label for="filter-merchant-name">商户名:</label>
+                        <input type="text" id="filter-merchant-name" class="filter-input" placeholder="请输入商户名">
+                    </div>
+                    <div class="filter-group">
+                        <label for="filter-sub-account">子账号:</label>
+                        <select id="filter-sub-account" class="filter-select">
+                            <option value="">请选择</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="filter-channel">渠道:</label>
+                        <select id="filter-channel" class="filter-select">
+                            <option value="">请选择</option>
+                        </select>
+                    </div>
+                    <button class="filter-search-btn" onclick="applyFilters()">搜索</button>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons-container">
+                <button class="action-btn bind-btn" onclick="showAddNewForm()">
+                    <span class="action-icon">🔗</span>
+                    <span>绑定</span>
+                </button>
+                <button class="action-btn modify-btn" onclick="modifySelected()" disabled>
+                    <span class="action-icon">✏️</span>
+                    <span>修改</span>
+                </button>
+                <button class="action-btn unbind-btn" onclick="unbindSelected()" disabled>
+                    <span class="action-icon">🔓</span>
+                    <span>解绑</span>
+                </button>
+                <button class="action-btn copy-btn" onclick="copySelected()" disabled>
+                    <span class="action-icon">📋</span>
+                    <span>复制</span>
+                </button>
+            </div>
+
+            <!-- Summary Table -->
+            <div class="table-container">
+                <table class="summary-table" id="summaryTable">
+                    <thead>
+                        <tr>
+                            <th width="40">
+                                <input type="radio" name="table-select" style="display: none;">
+                            </th>
+                            <th>商户名 <span class="sort-icon">▼</span></th>
+                            <th>子账号 <span class="sort-icon">▼</span></th>
+                            <th>渠道 <span class="sort-icon">▼</span></th>
+                            <th>支付种类 <span class="sort-icon">▼</span></th>
+                            <th>通道名 <span class="sort-icon">▼</span></th>
+                            <th>渠道终端代码 <span class="sort-icon">▼</span></th>
+                            <th>渠道终端密码 <span class="sort-icon">▼</span></th>
+                            <th>渠道终端token <span class="sort-icon">▼</span></th>
+                            <th>PayPal商户账号 <span class="sort-icon">▼</span></th>
+                            <th>状态 <span class="sort-icon">▼</span></th>
+                            <th>创建人 <span class="sort-icon">▼</span></th>
+                            <th>创建时间 <span class="sort-icon">▼</span></th>
+                        </tr>
+                    </thead>
+                    <tbody id="summaryTableBody">
+                        <!-- Data will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination-container">
+                <div class="pagination-info">
+                    <span id="paginationRange">1~10</span>
+                </div>
+                <div class="pagination-controls">
+                    <button class="pagination-btn" id="prevPageBtn" onclick="changePage(-1)" disabled>上一页</button>
+                    <button class="pagination-btn" id="nextPageBtn" onclick="changePage(1)">下一页</button>
+                    <select class="pagination-select" id="pageSizeSelect" onchange="changePageSize()">
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Configuration Form Card (Hidden by default) -->
+        <div class="config-card" id="configFormCard" style="display: none;">
             <div class="card-body">
                 <!-- Unified Configuration Form -->
                 <form id="channelBindingForm" class="config-form">
@@ -447,18 +539,12 @@
                 <!-- Form Actions -->
                 <div class="form-actions">
                     <button type="button" class="btn btn-secondary" id="prevBtn" style="display: none;">上一步</button>
+                    <button type="button" class="btn btn-secondary" id="backBtn" onclick="hideAddNewForm()">返回</button>
                     <button type="button" class="btn btn-secondary" id="resetBtn">重置</button>
                     <button type="button" class="btn btn-primary" id="nextBtn">提交</button>
                     <button type="button" class="btn btn-primary" id="submitBtn" style="display: none;">提交配置</button>
                 </div>
 
-                <!-- Connection Test Status -->
-                <div id="connectionTestStatus" class="connection-test-status" style="display: none;">
-                    <div class="connection-test-content">
-                        <span class="connection-test-icon" id="connectionTestIcon"></span>
-                        <span class="connection-test-text" id="connectionTestText"></span>
-                    </div>
-                </div>
             </div>
         </div>
 
@@ -542,7 +628,7 @@
                                 <div class="form-grid">
                                     <div class="form-group">
                                         <label>绑定接口类型 <span class="required">*</span></label>
-                                        <select id="shopyy-direct-bind-interface-type" name="bindInterfaceType" class="form-select" required>
+                                        <select id="shopyy-direct-bind-interface-type" name="bindInterfaceType" class="form-select" required disabled readonly>
                                             <option value="">请选择</option>
                                             <option value="2方" selected>2方</option>
                                             <option value="3方">3方</option>
@@ -551,7 +637,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label>平台来源 <span class="required">*</span></label>
-                                        <select id="shopyy-direct-platform-source" name="platformSource" class="form-select" required>
+                                        <select id="shopyy-direct-platform-source" name="platformSource" class="form-select" required disabled readonly>
                                             <option value="">请选择</option>
                                             <option value="Shopyy" selected>Shopyy</option>
                                             <option value="Shopline">Shopline</option>
@@ -567,7 +653,7 @@
                                 <div class="form-grid">
                                     <div class="form-group">
                                         <label>绑定接口类型 <span class="required">*</span></label>
-                                        <select id="shopyy-redirect-bind-interface-type" name="bindInterfaceType" class="form-select" required>
+                                        <select id="shopyy-redirect-bind-interface-type" name="bindInterfaceType" class="form-select" required disabled readonly>
                                             <option value="">请选择</option>
                                             <option value="2方">2方</option>
                                             <option value="3方" selected>3方</option>
@@ -576,7 +662,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label>平台来源 <span class="required">*</span></label>
-                                        <select id="shopyy-redirect-platform-source" name="platformSource" class="form-select" required>
+                                        <select id="shopyy-redirect-platform-source" name="platformSource" class="form-select" required disabled readonly>
                                             <option value="">请选择</option>
                                             <option value="Shopyy" selected>Shopyy</option>
                                             <option value="Shopline">Shopline</option>
@@ -601,7 +687,7 @@
                                 <div class="form-grid">
                                     <div class="form-group">
                                         <label>绑定接口类型 <span class="required">*</span></label>
-                                        <select id="shopline-direct-bind-interface-type" name="bindInterfaceType" class="form-select" required>
+                                        <select id="shopline-direct-bind-interface-type" name="bindInterfaceType" class="form-select" required disabled readonly>
                                             <option value="">请选择</option>
                                             <option value="2方" selected>2方</option>
                                             <option value="3方">3方</option>
@@ -610,7 +696,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label>平台来源 <span class="required">*</span></label>
-                                        <select id="shopline-direct-platform-source" name="platformSource" class="form-select" required>
+                                        <select id="shopline-direct-platform-source" name="platformSource" class="form-select" required disabled readonly>
                                             <option value="">请选择</option>
                                             <option value="Shopyy">Shopyy</option>
                                             <option value="Shopline" selected>Shopline</option>
@@ -626,7 +712,7 @@
                                 <div class="form-grid">
                                     <div class="form-group">
                                         <label>绑定接口类型 <span class="required">*</span></label>
-                                        <select id="shopline-redirect-bind-interface-type" name="bindInterfaceType" class="form-select" required>
+                                        <select id="shopline-redirect-bind-interface-type" name="bindInterfaceType" class="form-select" required disabled readonly>
                                             <option value="">请选择</option>
                                             <option value="2方">2方</option>
                                             <option value="3方" selected>3方</option>
@@ -635,7 +721,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label>平台来源 <span class="required">*</span></label>
-                                        <select id="shopline-redirect-platform-source" name="platformSource" class="form-select" required>
+                                        <select id="shopline-redirect-platform-source" name="platformSource" class="form-select" required disabled readonly>
                                             <option value="">请选择</option>
                                             <option value="Shopyy">Shopyy</option>
                                             <option value="Shopline" selected>Shopline</option>
@@ -660,7 +746,7 @@
                                 <div class="form-grid">
                                     <div class="form-group">
                                         <label>绑定接口类型 <span class="required">*</span></label>
-                                        <select id="shoplazza-direct-bind-interface-type" name="bindInterfaceType" class="form-select" required>
+                                        <select id="shoplazza-direct-bind-interface-type" name="bindInterfaceType" class="form-select" required disabled readonly>
                                             <option value="">请选择</option>
                                             <option value="2方直连">2方直连</option>
                                             <option value="3方" selected>3方</option>
@@ -669,7 +755,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label>平台来源 <span class="required">*</span></label>
-                                        <select id="shoplazza-direct-platform-source" name="platformSource" class="form-select" required>
+                                        <select id="shoplazza-direct-platform-source" name="platformSource" class="form-select" required disabled readonly>
                                             <option value="">请选择</option>
                                             <option value="Shopyy">Shopyy</option>
                                             <option value="Shopline">Shopline</option>
@@ -685,7 +771,7 @@
                                 <div class="form-grid">
                                     <div class="form-group">
                                         <label>绑定接口类型 <span class="required">*</span></label>
-                                        <select id="shoplazza-redirect-bind-interface-type" name="bindInterfaceType" class="form-select" required>
+                                        <select id="shoplazza-redirect-bind-interface-type" name="bindInterfaceType" class="form-select" required disabled readonly>
                                             <option value="">请选择</option>
                                             <option value="2方">2方</option>
                                             <option value="3方" selected>3方</option>
@@ -694,7 +780,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label>平台来源 <span class="required">*</span></label>
-                                        <select id="shoplazza-redirect-platform-source" name="platformSource" class="form-select" required>
+                                        <select id="shoplazza-redirect-platform-source" name="platformSource" class="form-select" required disabled readonly>
                                             <option value="">请选择</option>
                                             <option value="Shopyy">Shopyy</option>
                                             <option value="Shopline">Shopline</option>
@@ -842,7 +928,7 @@
                                     <div class="form-grid">
                                         <div class="form-group full-width">
                                             <label>域名 <span class="required">*</span></label>
-                                            <input type="text" id="rr-domain" name="rrDomain" class="form-input" placeholder="checkout.example.com" required>
+                                            <input type="text" id="rr-domain" name="rrDomain" class="form-input" placeholder="checkout.example.com">
                                             <small class="form-hint">申请对应渠道时使用的域名，B站域名(需要 StarSaas 解析域名后才能使用，域名格式例如: checkout.example.com 或 api.example.com)，必填(注意域名格式)</small>
                                         </div>
                                         <div class="form-group">
@@ -1040,7 +1126,35 @@
                                 </div>
                             </div>
                         </form>
+                        
+                        <!-- Connection Test Options -->
+                        <div class="connection-test-options" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+                            <label class="connection-test-checkbox-label">
+                                <input type="checkbox" id="performConnectionTest" name="performConnectionTest" checked>
+                                <span>保存配置后执行连接测试</span>
+                            </label>
+                            
+                            <!-- Saved Connection Test Result -->
+                            <div id="savedConnectionTestResult" class="saved-connection-test-result" style="display: none; margin-top: 12px;">
+                                <div class="saved-result-header">
+                                    <span class="saved-result-label">上次连接测试：</span>
+                                </div>
+                                <div class="saved-result-content">
+                                    <span class="saved-result-date" id="savedTestDate"></span>
+                                    <span class="saved-result-status" id="savedTestStatus"></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Connection Test Status (Live) -->
+                        <div id="connectionTestStatus" class="connection-test-status" style="display: none;">
+                            <div class="connection-test-content">
+                                <span class="connection-test-icon" id="connectionTestIcon"></span>
+                                <span class="connection-test-text" id="connectionTestText"></span>
+                            </div>
+                        </div>
                     </div>
+                    
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" onclick="resetRoundRobinForm()">重置</button>
                         <button type="button" class="btn btn-primary" onclick="submitRoundRobinForm()">提交</button>
@@ -1159,11 +1273,12 @@
                                         <th>失败数</th>
                                         <th>拒绝数</th>
                                         <th>成功率</th>
+                                        <th>详细</th>
                                     </tr>
                                 </thead>
                                 <tbody id="transactionStatsBody">
                                     <tr>
-                                        <td colspan="6" style="text-align: center; padding: 40px; color: #999;">加载中...</td>
+                                        <td colspan="7" style="text-align: center; padding: 40px; color: #999;">加载中...</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -1171,7 +1286,7 @@
                     </div>
 
                     <!-- Failed/Rejection Reasons -->
-                    <div class="analysis-section">
+                    <div class="analysis-section" id="rejectionReasonsSection" style="display: none;">
                         <h3 class="section-title">失败/拒绝原因分析</h3>
                         <div class="table-container">
                             <table class="data-table" id="rejectionReasonsTable">
@@ -2001,6 +2116,11 @@
             document.getElementById('roundrobin-modal').style.display = 'flex';
             // Setup event listeners for conditional fields
             setupGatewaySettingsListeners();
+            // Hide saved connection test result for new form
+            const savedResult = document.getElementById('savedConnectionTestResult');
+            if (savedResult) {
+                savedResult.style.display = 'none';
+            }
         };
 
         // Edit Round Robin Plan
@@ -2022,6 +2142,8 @@
             document.getElementById('roundrobin-modal').style.display = 'flex';
             // Setup event listeners for conditional fields
             setupGatewaySettingsListeners();
+            // Load saved connection test result
+            loadSavedConnectionTestResult();
         };
 
         // Load Merchants for Round Robin
@@ -2096,6 +2218,24 @@
         async function loadSubAccountsForRoundRobin(merchantId) {
             const subAccountSelect = document.getElementById('rr-subaccount');
             
+            // Use default sub-accounts immediately (don't wait for API)
+            const defaultSubAccounts = [
+                { id: 'starsaas-001', name: 'STARSAAS-001' },
+                { id: 'starsaas-002', name: 'STARSAAS-002' },
+                { id: 'starsaas-003', name: 'STARSAAS-003' }
+            ];
+            
+            // Load defaults immediately
+            subAccountSelect.innerHTML = '<option value="">请选择</option>';
+            defaultSubAccounts.forEach(subAccount => {
+                const option = document.createElement('option');
+                option.value = subAccount.id;
+                option.textContent = subAccount.name;
+                subAccountSelect.appendChild(option);
+            });
+            subAccountSelect.disabled = false;
+            
+            // Try to load from API in background (optional)
             try {
                 const response = await fetch(`/api/merchants/${merchantId}/sub-accounts`, {
                     method: 'GET',
@@ -2117,11 +2257,11 @@
                     }
                 }
             } catch (error) {
-                console.warn('Failed to load sub-accounts from API:', error);
+                // Silently fail - we already have default sub-accounts loaded
+                console.log('Failed to load sub-accounts from API (using defaults):', error.message);
             }
             
-            // Fallback: Use mock data if API fails
-            subAccountSelect.innerHTML = '<option value="">请选择</option>';
+            // Fallback already loaded above, so we're done
             const mockSubAccounts = [
                 { id: 'sub1', name: 'STARSAAS' },
                 { id: 'sub2', name: 'Sub Account 2' },
@@ -2529,20 +2669,63 @@
             document.getElementById('rr-use-platform-order-yes').checked = true;
             roundRobinRowCounter = 0;
             currentEditingRoundRobin = null;
+            // Reset connection test checkbox to checked
+            const performTestCheckbox = document.getElementById('performConnectionTest');
+            if (performTestCheckbox) {
+                performTestCheckbox.checked = true;
+            }
+            // Hide connection test status (if function exists)
+            if (typeof hideConnectionTest === 'function') {
+                hideConnectionTest();
+            }
+            // Hide saved connection test result
+            const savedResult = document.getElementById('savedConnectionTestResult');
+            if (savedResult) {
+                savedResult.style.display = 'none';
+            }
         };
 
         // Submit Round Robin Form
         window.submitRoundRobinForm = async function() {
             const form = document.getElementById('roundrobin-form');
-            if (!form.checkValidity()) {
-                form.reportValidity();
+            
+            // Manual validation to avoid "not focusable" error with hidden fields
+            // Check only visible required fields
+            const merchant = document.getElementById('rr-merchant')?.value;
+            const subAccount = document.getElementById('rr-subaccount')?.value;
+            const type = document.getElementById('rr-type')?.value;
+            
+            if (!merchant || !subAccount || !type) {
+                alert('请填写商户号、子账号和轮询类型');
                 return;
             }
-
+            
             // Validate plan rows
             const planRows = document.querySelectorAll('#rr-plan-tbody tr');
             if (planRows.length === 0) {
                 alert('请至少添加一条轮循计划');
+                return;
+            }
+            
+            // Validate each plan row - check domain in each row
+            let hasInvalidRow = false;
+            planRows.forEach((row, index) => {
+                const domain = row.querySelector('[name="rrRowDomain"]')?.value;
+                const paymentMethod = row.querySelector('[name="rrPaymentMethod"]')?.value;
+                const channel = row.querySelector('[name="rrChannel"]')?.value;
+                const accountName = row.querySelector('[name="rrAccountName"]')?.value;
+                
+                if (!domain || domain.trim() === '' || !paymentMethod || !channel || !accountName) {
+                    hasInvalidRow = true;
+                    if (!domain || domain.trim() === '') {
+                        alert(`第 ${index + 1} 行的域名字段为必填项`);
+                    } else {
+                        alert(`第 ${index + 1} 行请填写完整的计划信息`);
+                    }
+                }
+            });
+            
+            if (hasInvalidRow) {
                 return;
             }
 
@@ -2622,8 +2805,46 @@
                 });
 
                 if (response.ok) {
-                    alert('轮循配置保存成功！');
-                    closeRoundRobinModal();
+                    // Check if connection test should be performed
+                    const performTest = document.getElementById('performConnectionTest')?.checked ?? true;
+                    
+                    if (performTest) {
+                        // Show connection test after successful save
+                        console.log('[Round Robin] Save successful, performing connection test');
+                        
+                        // Show connection test immediately
+                        if (typeof window.showConnectionTest === 'function') {
+                            window.showConnectionTest();
+                            console.log('[Round Robin] Connection test status shown');
+                        } else {
+                            console.warn('[Round Robin] showConnectionTest function not available');
+                        }
+                        
+                        // Run connection test animation
+                        let testResult = 'failed';
+                        if (typeof window.mockConnectionTest === 'function') {
+                            try {
+                                await window.mockConnectionTest();
+                                testResult = 'success';
+                                console.log('[Round Robin] Connection test completed successfully');
+                            } catch (error) {
+                                testResult = 'failed';
+                                console.error('[Round Robin] Connection test failed:', error);
+                            }
+                        } else {
+                            console.warn('[Round Robin] mockConnectionTest function not available');
+                        }
+                        
+                        // Save connection test result
+                        saveConnectionTestResult(testResult);
+                        
+                        // Wait a bit for user to see the success message
+                        await new Promise(resolve => setTimeout(resolve, 2000));
+                    } else {
+                        console.log('[Round Robin] Connection test skipped (checkbox unchecked)');
+                    }
+                    
+                    // Refresh the list but keep modal open
                     loadRoundRobinList();
                 } else {
                     throw new Error('Save failed');
@@ -2640,9 +2861,140 @@
                     roundRobinData.push(formData);
                 }
                 localStorage.setItem('roundRobinList', JSON.stringify(roundRobinData));
-                alert('轮循配置已保存到本地（演示模式）');
-                closeRoundRobinModal();
+                
+                // Check if connection test should be performed
+                const performTest = document.getElementById('performConnectionTest')?.checked ?? true;
+                
+                if (performTest) {
+                    // Show connection test even in fallback mode
+                    console.log('[Round Robin] Save to localStorage, performing connection test');
+                    
+                    // Show connection test immediately
+                    if (typeof window.showConnectionTest === 'function') {
+                        window.showConnectionTest();
+                        console.log('[Round Robin] Connection test status shown (localStorage)');
+                    } else {
+                        console.warn('[Round Robin] showConnectionTest function not available');
+                    }
+                    
+                    // Run connection test animation
+                    let testResult = 'failed';
+                    if (typeof window.mockConnectionTest === 'function') {
+                        try {
+                            await window.mockConnectionTest();
+                            testResult = 'success';
+                            console.log('[Round Robin] Connection test completed (localStorage)');
+                        } catch (error) {
+                            testResult = 'failed';
+                            console.error('[Round Robin] Connection test failed:', error);
+                        }
+                    } else {
+                        console.warn('[Round Robin] mockConnectionTest function not available');
+                    }
+                    
+                    // Save connection test result
+                    saveConnectionTestResult(testResult);
+                    
+                    // Wait a bit for user to see the success message
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                } else {
+                    console.log('[Round Robin] Connection test skipped (checkbox unchecked)');
+                }
+                
+                // Refresh the list but keep modal open
                 loadRoundRobinList();
+            }
+        };
+
+        // Save Connection Test Result
+        window.saveConnectionTestResult = function(result) {
+            const testDate = new Date();
+            const testData = {
+                date: testDate.toISOString(),
+                dateTime: testDate.toLocaleString('zh-CN', { 
+                    year: 'numeric', 
+                    month: '2-digit', 
+                    day: '2-digit', 
+                    hour: '2-digit', 
+                    minute: '2-digit', 
+                    second: '2-digit' 
+                }),
+                result: result, // 'success' or 'failed'
+                timestamp: testDate.getTime()
+            };
+            
+            // Save to localStorage (keyed by form data ID if available)
+            const formId = currentEditingRoundRobin?.id || 'latest';
+            localStorage.setItem(`roundRobinConnectionTest_${formId}`, JSON.stringify(testData));
+            
+            // Also save as latest
+            localStorage.setItem('roundRobinConnectionTest_latest', JSON.stringify(testData));
+            
+            // Display the saved result
+            displaySavedConnectionTestResult(testData);
+            
+            console.log('[Round Robin] Connection test result saved:', testData);
+        };
+        
+        // Display Saved Connection Test Result
+        window.displaySavedConnectionTestResult = function(testData) {
+            const resultContainer = document.getElementById('savedConnectionTestResult');
+            const dateEl = document.getElementById('savedTestDate');
+            const statusEl = document.getElementById('savedTestStatus');
+            
+            console.log('[Round Robin] Displaying saved connection test result:', testData);
+            
+            if (resultContainer && dateEl && statusEl && testData) {
+                // Format date/time
+                let displayDate = testData.dateTime;
+                if (!displayDate && testData.date) {
+                    try {
+                        const date = new Date(testData.date);
+                        displayDate = date.toLocaleString('zh-CN', { 
+                            year: 'numeric', 
+                            month: '2-digit', 
+                            day: '2-digit', 
+                            hour: '2-digit', 
+                            minute: '2-digit', 
+                            second: '2-digit' 
+                        });
+                    } catch (e) {
+                        displayDate = testData.date;
+                    }
+                }
+                
+                dateEl.textContent = displayDate || '未知';
+                statusEl.textContent = testData.result === 'success' ? '成功' : '失败';
+                statusEl.className = 'saved-result-status ' + (testData.result === 'success' ? 'success' : 'failed');
+                resultContainer.style.display = 'block';
+                
+                // Scroll into view
+                setTimeout(() => {
+                    resultContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }, 100);
+            } else {
+                console.warn('[Round Robin] Missing elements for displaying saved result:', {
+                    resultContainer: !!resultContainer,
+                    dateEl: !!dateEl,
+                    statusEl: !!statusEl,
+                    testData: !!testData
+                });
+            }
+        };
+        
+        // Load Saved Connection Test Result
+        window.loadSavedConnectionTestResult = function() {
+            const formId = currentEditingRoundRobin?.id || 'latest';
+            const saved = localStorage.getItem(`roundRobinConnectionTest_${formId}`) || 
+                         localStorage.getItem('roundRobinConnectionTest_latest');
+            
+            if (saved) {
+                try {
+                    const testData = JSON.parse(saved);
+                    displaySavedConnectionTestResult(testData);
+                } catch (e) {
+                    console.warn('Failed to parse saved connection test result:', e);
+                }
             }
         };
 
@@ -2650,6 +3002,10 @@
         window.closeRoundRobinModal = function() {
             document.getElementById('roundrobin-modal').style.display = 'none';
             resetRoundRobinForm();
+            // Hide connection test status (if function exists)
+            if (typeof hideConnectionTest === 'function') {
+                hideConnectionTest();
+            }
         };
 
         // Delete Round Robin
@@ -2786,6 +3142,9 @@
             }
         }
 
+        // Track selected channel for filtering rejection reasons
+        let selectedChannelForDetails = null;
+
         // Reset analysis filters
         window.resetAnalysisFilters = function() {
             document.getElementById('timePeriodSelect').value = 'last-month';
@@ -2793,8 +3152,45 @@
             document.getElementById('analysisSubMerchantSelect').value = '';
             document.getElementById('analysisChannelSelect').value = '';
             document.getElementById('analysisPlatformSelect').value = '';
+            selectedChannelForDetails = null;
+            // Hide the rejection reasons section when filters are reset
+            const reasonsSection = document.getElementById('rejectionReasonsSection');
+            if (reasonsSection) {
+                reasonsSection.style.display = 'none';
+            }
             updateSubMerchantOptions();
             loadAnalysisData();
+        };
+        
+        // Show details for a specific channel
+        window.showChannelDetails = function(channelName) {
+            console.log('[Analysis] showChannelDetails called for channel:', channelName);
+            selectedChannelForDetails = channelName;
+            
+            // Show the rejection reasons section
+            const reasonsSection = document.getElementById('rejectionReasonsSection');
+            if (reasonsSection) {
+                // Force show the section
+                reasonsSection.style.display = 'block';
+                reasonsSection.style.visibility = 'visible';
+                reasonsSection.style.opacity = '1';
+                // Force a reflow to ensure display change is applied
+                void reasonsSection.offsetHeight;
+                console.log('[Analysis] Section display set to block, computed style:', window.getComputedStyle(reasonsSection).display);
+            } else {
+                console.error('[Analysis] rejectionReasonsSection element not found');
+            }
+            
+            // Reload analysis data to show filtered rejection reasons
+            loadAnalysisData();
+            
+            // Scroll to rejection reasons section after data loads
+            setTimeout(() => {
+                const reasonsTable = document.getElementById('rejectionReasonsTable');
+                if (reasonsTable) {
+                    reasonsTable.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 600); // Wait a bit longer for data to load
         };
 
         // Load analysis data
@@ -2806,8 +3202,12 @@
             const platform = document.getElementById('analysisPlatformSelect').value;
             
             // Show loading
-            document.getElementById('transactionStatsBody').innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px; color: #999;">加载中...</td></tr>';
-            document.getElementById('rejectionReasonsBody').innerHTML = '<tr><td colspan="3" style="text-align: center; padding: 40px; color: #999;">加载中...</td></tr>';
+            document.getElementById('transactionStatsBody').innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px; color: #999;">加载中...</td></tr>';
+            // Only show loading in rejection reasons if section is visible
+            const reasonsSection = document.getElementById('rejectionReasonsSection');
+            if (reasonsSection && reasonsSection.style.display !== 'none') {
+                document.getElementById('rejectionReasonsBody').innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 40px; color: #999;">加载中...</td></tr>';
+            }
             
             // Mock data - in production, this would fetch from API with filters
             setTimeout(() => {
@@ -2815,6 +3215,100 @@
                 displayAnalysisData(data);
             }, 500);
         };
+
+        // Get channel-specific rejection reasons
+        function getChannelRejectionReasons(channelName, timePeriod) {
+            // Base rejection reasons data per channel
+            const channelReasons = {
+                'YSEPAY': {
+                    'last-week': [
+                        { reason: '余额不足', count: 8, percentage: 53.3 },
+                        { reason: '卡号无效', count: 4, percentage: 26.7 },
+                        { reason: '交易超时', count: 2, percentage: 13.3 },
+                        { reason: '风险控制拒绝', count: 1, percentage: 6.7 }
+                    ],
+                    'last-month': [
+                        { reason: '余额不足', count: 32, percentage: 53.3 },
+                        { reason: '卡号无效', count: 16, percentage: 26.7 },
+                        { reason: '交易超时', count: 8, percentage: 13.3 },
+                        { reason: '风险控制拒绝', count: 4, percentage: 6.7 }
+                    ],
+                    'all-time': [
+                        { reason: '余额不足', count: 160, percentage: 53.3 },
+                        { reason: '卡号无效', count: 80, percentage: 26.7 },
+                        { reason: '交易超时', count: 40, percentage: 13.3 },
+                        { reason: '风险控制拒绝', count: 20, percentage: 6.7 }
+                    ]
+                },
+                'RUMBLE': {
+                    'last-week': [
+                        { reason: '卡号无效', count: 10, percentage: 55.6 },
+                        { reason: '余额不足', count: 5, percentage: 27.8 },
+                        { reason: '交易超时', count: 2, percentage: 11.1 },
+                        { reason: '渠道维护', count: 1, percentage: 5.6 }
+                    ],
+                    'last-month': [
+                        { reason: '卡号无效', count: 44, percentage: 55.0 },
+                        { reason: '余额不足', count: 22, percentage: 27.5 },
+                        { reason: '交易超时', count: 9, percentage: 11.3 },
+                        { reason: '渠道维护', count: 5, percentage: 6.3 }
+                    ],
+                    'all-time': [
+                        { reason: '卡号无效', count: 182, percentage: 55.2 },
+                        { reason: '余额不足', count: 91, percentage: 27.6 },
+                        { reason: '交易超时', count: 37, percentage: 11.2 },
+                        { reason: '渠道维护', count: 20, percentage: 6.1 }
+                    ]
+                },
+                'EVONET': {
+                    'last-week': [
+                        { reason: '交易超时', count: 6, percentage: 60.0 },
+                        { reason: '余额不足', count: 2, percentage: 20.0 },
+                        { reason: '平台超时', count: 1, percentage: 10.0 },
+                        { reason: '平台接口异常', count: 1, percentage: 10.0 }
+                    ],
+                    'last-month': [
+                        { reason: '交易超时', count: 21, percentage: 60.0 },
+                        { reason: '余额不足', count: 7, percentage: 20.0 },
+                        { reason: '平台超时', count: 4, percentage: 11.4 },
+                        { reason: '平台接口异常', count: 3, percentage: 8.6 }
+                    ],
+                    'all-time': [
+                        { reason: '交易超时', count: 96, percentage: 60.0 },
+                        { reason: '余额不足', count: 32, percentage: 20.0 },
+                        { reason: '平台超时', count: 18, percentage: 11.3 },
+                        { reason: '平台接口异常', count: 14, percentage: 8.8 }
+                    ]
+                },
+                'PAYSAAS': {
+                    'last-week': [
+                        { reason: '无效币种配置', count: 15, percentage: 55.6 },
+                        { reason: '渠道不支持该币种', count: 8, percentage: 29.6 },
+                        { reason: '平台币种不支持', count: 3, percentage: 11.1 },
+                        { reason: '平台加密错误', count: 1, percentage: 3.7 }
+                    ],
+                    'last-month': [
+                        { reason: '无效币种配置', count: 47, percentage: 55.3 },
+                        { reason: '渠道不支持该币种', count: 25, percentage: 29.4 },
+                        { reason: '平台币种不支持', count: 10, percentage: 11.8 },
+                        { reason: '平台加密错误', count: 3, percentage: 3.5 }
+                    ],
+                    'all-time': [
+                        { reason: '无效币种配置', count: 200, percentage: 55.6 },
+                        { reason: '渠道不支持该币种', count: 106, percentage: 29.4 },
+                        { reason: '平台币种不支持', count: 42, percentage: 11.7 },
+                        { reason: '平台加密错误', count: 12, percentage: 3.3 }
+                    ]
+                }
+            };
+            
+            const channelData = channelReasons[channelName];
+            if (!channelData) {
+                return [];
+            }
+            
+            return channelData[timePeriod] || channelData['last-month'] || [];
+        }
 
         // Get mock analysis data (make it globally accessible)
         window.getMockAnalysisData = function(timePeriod, filters = {}) {
@@ -3010,12 +3504,12 @@
             // Update transaction statistics table
             const statsBody = document.getElementById('transactionStatsBody');
             if (!data.byChannel || data.byChannel.length === 0) {
-                statsBody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px; color: #999;">暂无数据</td></tr>';
+                statsBody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px; color: #999;">暂无数据</td></tr>';
             } else {
                 // Filter out channels with 0 transactions if needed, or show all
                 const channelsToShow = data.byChannel.filter(c => c.total > 0);
                 if (channelsToShow.length === 0) {
-                    statsBody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px; color: #999;">暂无数据</td></tr>';
+                    statsBody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px; color: #999;">暂无数据</td></tr>';
                 } else {
                     statsBody.innerHTML = channelsToShow.map(channel => {
                         const total = channel.total || 0;
@@ -3023,49 +3517,96 @@
                         const failed = channel.failed || 0;
                         const rejected = channel.rejected || 0;
                         const successRate = total > 0 ? ((success / total) * 100).toFixed(1) : '0.0';
+                        const isSelected = selectedChannelForDetails === channel.channel;
                         return `
-                            <tr>
+                            <tr ${isSelected ? 'style="background-color: #f0f8ff;"' : ''}>
                                 <td>${channel.channel}</td>
                                 <td>${total.toLocaleString()}</td>
                                 <td style="color: #28a745;">${success.toLocaleString()}</td>
                                 <td style="color: #ff9800;">${failed.toLocaleString()}</td>
                                 <td style="color: #dc3545;">${rejected.toLocaleString()}</td>
                                 <td><strong>${successRate}%</strong></td>
+                                <td>
+                                    <a href="javascript:void(0);" 
+                                       onclick="showChannelDetails('${channel.channel}')" 
+                                       style="color: #4A90E2; text-decoration: none; cursor: pointer; font-weight: 500;">
+                                        ${isSelected ? '✓ 已选择' : '详细'}
+                                    </a>
+                                </td>
                             </tr>
                         `;
                     }).join('');
                 }
             }
 
-            // Update rejection reasons table
-            const reasonsBody = document.getElementById('rejectionReasonsBody');
-            if (!data.rejectionReasons || data.rejectionReasons.length === 0) {
-                reasonsBody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 40px; color: #999;">暂无数据</td></tr>';
-            } else {
-                // Filter out reasons with 0 count
-                const reasonsToShow = data.rejectionReasons.filter(r => r.count > 0);
-                if (reasonsToShow.length === 0) {
-                    reasonsBody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 40px; color: #999;">暂无数据</td></tr>';
+            // Update rejection reasons table - filter by selected channel if any
+            // Only update if section is visible (i.e., a channel detail was selected)
+            const reasonsSection = document.getElementById('rejectionReasonsSection');
+            // Check if section should be visible (either explicitly set to block or if a channel is selected)
+            const shouldShowSection = selectedChannelForDetails !== null;
+            const isSectionVisible = reasonsSection && shouldShowSection;
+            
+            if (isSectionVisible) {
+                // Ensure section is visible
+                if (reasonsSection.style.display === 'none') {
+                    reasonsSection.style.display = 'block';
+                }
+                const reasonsBody = document.getElementById('rejectionReasonsBody');
+                let reasonsToDisplay = [];
+                
+                if (selectedChannelForDetails) {
+                    // Show channel-specific rejection reasons
+                    const timePeriod = document.getElementById('timePeriodSelect').value;
+                    reasonsToDisplay = getChannelRejectionReasons(selectedChannelForDetails, timePeriod);
                 } else {
-                    // Recalculate percentages based on total rejected
-                    const totalRejected = reasonsToShow.reduce((sum, r) => sum + (r.count || 0), 0);
-                    reasonsBody.innerHTML = reasonsToShow.map((reason, index) => {
-                        const count = reason.count || 0;
-                        const percentage = totalRejected > 0 ? ((count / totalRejected) * 100).toFixed(1) : '0.0';
-                        const reasonKey = reason.reason;
-                        return `
-                            <tr>
-                                <td>${reason.reason}</td>
-                                <td>${count.toLocaleString()}</td>
-                                <td><strong>${percentage}%</strong></td>
-                                <td>
-                                    <a href="#" class="rejection-detail-link" onclick="showRejectionDetails('${reasonKey}', ${count}); return false;">
-                                        查看详情
-                                    </a>
-                                </td>
-                            </tr>
-                        `;
-                    }).join('');
+                    // Show all rejection reasons (aggregate)
+                    reasonsToDisplay = data.rejectionReasons || [];
+                }
+                
+                if (!reasonsToDisplay || reasonsToDisplay.length === 0) {
+                    const noDataMessage = selectedChannelForDetails 
+                        ? `暂无 ${selectedChannelForDetails} 渠道的失败/拒绝原因数据`
+                        : '暂无数据';
+                    reasonsBody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 40px; color: #999;">${noDataMessage}</td></tr>`;
+                } else {
+                    // Filter out reasons with 0 count
+                    const reasonsToShow = reasonsToDisplay.filter(r => r.count > 0);
+                    if (reasonsToShow.length === 0) {
+                        const noDataMessage = selectedChannelForDetails 
+                            ? `暂无 ${selectedChannelForDetails} 渠道的失败/拒绝原因数据`
+                            : '暂无数据';
+                        reasonsBody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 40px; color: #999;">${noDataMessage}</td></tr>`;
+                    } else {
+                        // Recalculate percentages based on total rejected
+                        const totalRejected = reasonsToShow.reduce((sum, r) => sum + (r.count || 0), 0);
+                        reasonsBody.innerHTML = reasonsToShow.map((reason, index) => {
+                            const count = reason.count || 0;
+                            const percentage = totalRejected > 0 ? ((count / totalRejected) * 100).toFixed(1) : '0.0';
+                            const reasonKey = reason.reason;
+                            return `
+                                <tr>
+                                    <td>${reason.reason}</td>
+                                    <td>${count.toLocaleString()}</td>
+                                    <td><strong>${percentage}%</strong></td>
+                                    <td>
+                                        <a href="#" class="rejection-detail-link" onclick="showRejectionDetails('${reasonKey}', ${count}); return false;">
+                                            查看详情
+                                        </a>
+                                    </td>
+                                </tr>
+                            `;
+                        }).join('');
+                    }
+                }
+                
+                // Update section title to show selected channel if any
+                const sectionTitle = document.querySelector('#rejectionReasonsTable').closest('.analysis-section')?.querySelector('.section-title');
+                if (sectionTitle) {
+                    if (selectedChannelForDetails) {
+                        sectionTitle.textContent = `失败/拒绝原因分析 - ${selectedChannelForDetails}`;
+                    } else {
+                        sectionTitle.textContent = '失败/拒绝原因分析';
+                    }
                 }
             }
         }
@@ -4024,6 +4565,330 @@
                 }
             });
         }
+
+        // ============================================
+        // Summary Table and Form Toggle Functions
+        // ============================================
+
+        // State management for summary table
+        let summaryData = [];
+        let filteredData = [];
+        let currentPage = 1;
+        let pageSize = 10;
+        let selectedRowId = null;
+
+        // Load summary data on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSummaryData();
+            populateFilterDropdowns();
+        });
+
+        // Load summary data from API
+        async function loadSummaryData() {
+            try {
+                const response = await fetch('/api/channel-binding/list', {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    summaryData = data.bindings || [];
+                    filteredData = [...summaryData];
+                    renderSummaryTable();
+                } else {
+                    // Fallback: use mock data for development
+                    console.warn('API call failed, using mock data');
+                    summaryData = getMockSummaryData();
+                    filteredData = [...summaryData];
+                    renderSummaryTable();
+                }
+            } catch (error) {
+                console.error('Failed to load summary data:', error);
+                // Use mock data as fallback
+                summaryData = getMockSummaryData();
+                filteredData = [...summaryData];
+                renderSummaryTable();
+            }
+        }
+
+        // Mock data for development
+        function getMockSummaryData() {
+            return [
+                {
+                    id: '1',
+                    merchantName: 'test0121',
+                    subAccount: 'test0112',
+                    channel: 'ONERWAY',
+                    paymentType: 'Credit Card',
+                    channelName: 'ONERWAY11040401001',
+                    terminalCode: '1',
+                    terminalPassword: '11',
+                    terminalToken: '1',
+                    paypalAccount: '',
+                    status: '绑定',
+                    creator: 'staradmin',
+                    createdAt: '2026-01-21 07:41:43'
+                },
+                {
+                    id: '2',
+                    merchantName: 'Demo Merchant 1',
+                    subAccount: 'Can',
+                    channel: 'METROSPAY',
+                    paymentType: 'Credit Card',
+                    channelName: 'METROSPAY1701001021',
+                    terminalCode: '100',
+                    terminalPassword: '1722207571190743041',
+                    terminalToken: '000000',
+                    paypalAccount: '',
+                    status: '绑定',
+                    creator: 'staradmin',
+                    createdAt: '2026-01-21 08:15:22'
+                },
+                {
+                    id: '3',
+                    merchantName: '空云PaymentLink VCC',
+                    subAccount: 'AIRWALLEX',
+                    channel: 'AIRWALLEX',
+                    paymentType: 'Credit Card',
+                    channelName: 'AIRWALLEX001',
+                    terminalCode: '67eb62c1157493d2784ab2d2',
+                    terminalPassword: 'sk_sandbox_373705b21606468aaaf4d179e2e1a472',
+                    terminalToken: 'MIIEKgIBADANBgkqhkiG9w0BAQEFAASCBBQwggQQAgEAAoHiAl....',
+                    paypalAccount: 'kid_c4f8ba8f7f2f405f876f84c87d673849',
+                    status: '绑定',
+                    creator: 'allen liao',
+                    createdAt: '2026-01-21 09:30:15'
+                }
+            ];
+        }
+
+        // Render summary table
+        function renderSummaryTable() {
+            const tbody = document.getElementById('summaryTableBody');
+            if (!tbody) return;
+
+            // Calculate pagination
+            const startIndex = (currentPage - 1) * pageSize;
+            const endIndex = startIndex + pageSize;
+            const pageData = filteredData.slice(startIndex, endIndex);
+
+            // Clear existing rows
+            tbody.innerHTML = '';
+
+            // Render rows
+            pageData.forEach((item, index) => {
+                const row = document.createElement('tr');
+                row.dataset.id = item.id;
+                row.onclick = () => selectRow(item.id);
+                
+                row.innerHTML = `
+                    <td>
+                        <input type="radio" name="table-select" value="${item.id}" 
+                               ${selectedRowId === item.id ? 'checked' : ''}
+                               onclick="event.stopPropagation(); selectRow('${item.id}')">
+                    </td>
+                    <td>${escapeHtml(item.merchantName || '')}</td>
+                    <td>${escapeHtml(item.subAccount || '')}</td>
+                    <td>${escapeHtml(item.channel || '')}</td>
+                    <td>${escapeHtml(item.paymentType || '')}</td>
+                    <td>${escapeHtml(item.channelName || '')}</td>
+                    <td>${escapeHtml(item.terminalCode || '')}</td>
+                    <td>${maskSensitiveData(item.terminalPassword || '')}</td>
+                    <td>${maskSensitiveData(item.terminalToken || '')}</td>
+                    <td>${escapeHtml(item.paypalAccount || '')}</td>
+                    <td><span class="status-badge status-${item.status === '绑定' ? 'bound' : 'unbound'}">${escapeHtml(item.status || '')}</span></td>
+                    <td>${escapeHtml(item.creator || '')}</td>
+                    <td>${escapeHtml(item.createdAt || '')}</td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            // Update pagination info
+            updatePaginationInfo();
+        }
+
+        // Mask sensitive data (show only first and last few characters)
+        function maskSensitiveData(value) {
+            if (!value || value.length <= 8) return '***';
+            return value.substring(0, 4) + '***' + value.substring(value.length - 4);
+        }
+
+        // Escape HTML to prevent XSS
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Select row
+        function selectRow(id) {
+            selectedRowId = id;
+            renderSummaryTable();
+            updateActionButtons();
+        }
+
+        // Update action buttons based on selection
+        function updateActionButtons() {
+            const modifyBtn = document.querySelector('.modify-btn');
+            const unbindBtn = document.querySelector('.unbind-btn');
+            const copyBtn = document.querySelector('.copy-btn');
+            
+            const hasSelection = selectedRowId !== null;
+            
+            if (modifyBtn) modifyBtn.disabled = !hasSelection;
+            if (unbindBtn) unbindBtn.disabled = !hasSelection;
+            if (copyBtn) copyBtn.disabled = !hasSelection;
+        }
+
+        // Show add new form
+        function showAddNewForm() {
+            document.getElementById('summarySection').style.display = 'none';
+            document.getElementById('configFormCard').style.display = 'block';
+            selectedRowId = null;
+            // Reset form
+            if (document.getElementById('channelBindingForm')) {
+                document.getElementById('channelBindingForm').reset();
+            }
+        }
+
+        // Hide add new form (show summary)
+        function hideAddNewForm() {
+            document.getElementById('summarySection').style.display = 'block';
+            document.getElementById('configFormCard').style.display = 'none';
+            // Reload data in case new binding was added
+            loadSummaryData();
+        }
+
+        // Apply filters
+        function applyFilters() {
+            const merchantName = document.getElementById('filter-merchant-name').value.toLowerCase();
+            const subAccount = document.getElementById('filter-sub-account').value;
+            const channel = document.getElementById('filter-channel').value;
+
+            filteredData = summaryData.filter(item => {
+                const matchesMerchant = !merchantName || (item.merchantName || '').toLowerCase().includes(merchantName);
+                const matchesSubAccount = !subAccount || item.subAccount === subAccount;
+                const matchesChannel = !channel || item.channel === channel;
+                
+                return matchesMerchant && matchesSubAccount && matchesChannel;
+            });
+
+            currentPage = 1;
+            renderSummaryTable();
+        }
+
+        // Populate filter dropdowns
+        async function populateFilterDropdowns() {
+            // Populate sub-account dropdown
+            const subAccountSelect = document.getElementById('filter-sub-account');
+            const subAccounts = [...new Set(summaryData.map(item => item.subAccount).filter(Boolean))];
+            subAccounts.forEach(subAccount => {
+                const option = document.createElement('option');
+                option.value = subAccount;
+                option.textContent = subAccount;
+                subAccountSelect.appendChild(option);
+            });
+
+            // Populate channel dropdown
+            const channelSelect = document.getElementById('filter-channel');
+            const channels = [...new Set(summaryData.map(item => item.channel).filter(Boolean))];
+            channels.forEach(channel => {
+                const option = document.createElement('option');
+                option.value = channel;
+                option.textContent = channel;
+                channelSelect.appendChild(option);
+            });
+        }
+
+        // Change page
+        function changePage(direction) {
+            const totalPages = Math.ceil(filteredData.length / pageSize);
+            const newPage = currentPage + direction;
+            
+            if (newPage >= 1 && newPage <= totalPages) {
+                currentPage = newPage;
+                renderSummaryTable();
+            }
+        }
+
+        // Change page size
+        function changePageSize() {
+            const select = document.getElementById('pageSizeSelect');
+            pageSize = parseInt(select.value);
+            currentPage = 1;
+            renderSummaryTable();
+        }
+
+        // Update pagination info
+        function updatePaginationInfo() {
+            const startIndex = (currentPage - 1) * pageSize + 1;
+            const endIndex = Math.min(currentPage * pageSize, filteredData.length);
+            const rangeEl = document.getElementById('paginationRange');
+            if (rangeEl) {
+                rangeEl.textContent = `${startIndex}~${endIndex}`;
+            }
+
+            const totalPages = Math.ceil(filteredData.length / pageSize);
+            const prevBtn = document.getElementById('prevPageBtn');
+            const nextBtn = document.getElementById('nextPageBtn');
+            
+            if (prevBtn) prevBtn.disabled = currentPage <= 1;
+            if (nextBtn) nextBtn.disabled = currentPage >= totalPages;
+        }
+
+        // Modify selected
+        function modifySelected() {
+            if (!selectedRowId) return;
+            const item = summaryData.find(d => d.id === selectedRowId);
+            if (!item) return;
+            
+            // Show form and populate with selected item data
+            showAddNewForm();
+            // TODO: Populate form fields with item data
+            console.log('Modify:', item);
+        }
+
+        // Unbind selected
+        async function unbindSelected() {
+            if (!selectedRowId) return;
+            
+            if (!confirm('确定要解绑选中的渠道吗？')) return;
+
+            try {
+                const response = await fetch(`/api/channel-binding/unbind/${selectedRowId}`, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+
+                if (response.ok) {
+                    alert('解绑成功');
+                    loadSummaryData();
+                } else {
+                    alert('解绑失败，请重试');
+                }
+            } catch (error) {
+                console.error('Unbind error:', error);
+                alert('解绑失败，请重试');
+            }
+        }
+
+        // Copy selected
+        function copySelected() {
+            if (!selectedRowId) return;
+            const item = summaryData.find(d => d.id === selectedRowId);
+            if (!item) return;
+            
+            // Show form and populate with selected item data (for editing)
+            showAddNewForm();
+            // TODO: Populate form fields with item data (as template for new binding)
+            console.log('Copy:', item);
+        }
+
     </script>
 </body>
 </html>

@@ -1,0 +1,1155 @@
+/* Foundry Chat Component - Modern Professional Design */
+
+/* Professional font family - system fonts for modern, clean look */
+.foundry-chat-window,
+.foundry-chat-window * {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.foundry-chat-icon {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 56px;
+    height: 56px;
+    background: #007bff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+    z-index: 1000;
+    transition: all 0.3s ease;
+    color: white;
+}
+
+.foundry-chat-icon:hover {
+    background: #0056b3;
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+}
+
+.foundry-chat-icon:active {
+    transform: scale(0.95);
+}
+
+.foundry-chat-icon svg {
+    width: 24px;
+    height: 24px;
+}
+
+.foundry-chat-window {
+    position: fixed;
+    bottom: 100px;
+    right: 24px;
+    width: 420px;
+    height: 650px;
+    background: #f8f9fa;
+    border-radius: 16px;
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    z-index: 1001;
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+    pointer-events: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    border: 1px solid #e9ecef;
+}
+
+.foundry-chat-window.active {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: all;
+}
+
+/* Modern Header with Gradient */
+.foundry-chat-header {
+    background: linear-gradient(180deg, #f1f3f5 0%, #e9ecef 100%);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #dee2e6;
+    border-radius: 16px 16px 0 0;
+}
+
+.foundry-chat-header-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+}
+
+.foundry-chat-header-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 28px;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+    line-height: 1;
+    overflow: hidden;
+}
+
+.foundry-chat-header-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.foundry-chat-header-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+}
+
+.foundry-chat-agent-selector-wrapper {
+    margin-left: auto;
+    margin-right: 12px;
+}
+
+.foundry-chat-agent-selector {
+    padding: 6px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: #fff;
+    font-size: 13px;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-width: 140px;
+}
+
+.foundry-chat-agent-selector:hover {
+    border-color: #4A90E2;
+}
+
+.foundry-chat-agent-selector:focus {
+    outline: none;
+    border-color: #4A90E2;
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.1);
+}
+
+.foundry-chat-header-reset {
+    background: transparent;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    margin-right: 8px;
+}
+
+.foundry-chat-header-reset:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: #333;
+}
+
+.foundry-chat-header-reset:active {
+    transform: scale(0.95);
+}
+
+.foundry-chat-header-reset svg {
+    width: 16px;
+    height: 16px;
+}
+
+.foundry-chat-header-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: #212529;
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+}
+
+.foundry-chat-header-title {
+    font-size: 12px;
+    color: #6c757d;
+    line-height: 1.4;
+    font-weight: 400;
+}
+
+.foundry-chat-header-options {
+    width: 32px;
+    height: 32px;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #6c757d;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.foundry-chat-header-options:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: #212529;
+}
+
+.foundry-chat-close-btn {
+    background: transparent;
+    border: none;
+    color: #6c757d;
+    font-size: 20px;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    transition: all 0.2s;
+    padding: 0;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.foundry-chat-close-btn:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: #212529;
+}
+
+/* Messages Area - Clean White Background */
+.foundry-chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+}
+
+.foundry-chat-messages::-webkit-scrollbar {
+    width: 6px;
+}
+
+.foundry-chat-messages::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.foundry-chat-messages::-webkit-scrollbar-thumb {
+    background: #ced4da;
+    border-radius: 3px;
+}
+
+.foundry-chat-messages::-webkit-scrollbar-thumb:hover {
+    background: #adb5bd;
+}
+
+/* Message Bubbles */
+.foundry-chat-message {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    animation: messageSlideIn 0.3s ease;
+    align-items: flex-end;
+}
+
+@keyframes messageSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.foundry-chat-message.user {
+    flex-direction: row-reverse;
+    justify-content: flex-start;
+}
+
+.foundry-chat-message.assistant {
+    justify-content: flex-start;
+}
+
+/* Bot Messages - Blue Bubbles (Left) */
+.foundry-chat-message.assistant .foundry-chat-message-content {
+    background: #007bff;
+    color: white;
+    border-radius: 18px 18px 18px 4px;
+    padding: 12px 16px;
+    max-width: 75%;
+    word-wrap: break-word;
+    line-height: 1.6;
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Formatting for assistant messages */
+.foundry-chat-message.assistant .foundry-chat-message-content p {
+    margin: 0 0 14px 0;
+    line-height: 1.6;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.foundry-chat-message.assistant .foundry-chat-message-content p:last-child {
+    margin-bottom: 0;
+}
+
+.foundry-chat-message.assistant .foundry-chat-message-content ul {
+    margin: 10px 0;
+    padding-left: 0;
+    list-style: none;
+}
+
+.foundry-chat-message.assistant .foundry-chat-message-content li {
+    margin: 8px 0;
+    padding-left: 20px;
+    position: relative;
+    line-height: 1.6;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+/* Markdown formatting for assistant messages (blue bubbles) */
+.foundry-chat-message.assistant .foundry-chat-message-content strong {
+    font-weight: 600;
+    color: inherit;
+}
+
+.foundry-chat-message.assistant .foundry-chat-message-content em {
+    font-style: italic;
+}
+
+.foundry-chat-message.assistant .foundry-chat-message-content code {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+}
+
+.foundry-chat-message.assistant .foundry-chat-message-content pre {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 12px;
+    border-radius: 6px;
+    overflow-x: auto;
+    margin: 8px 0;
+}
+
+.foundry-chat-message.assistant .foundry-chat-message-content pre code {
+    background: none;
+    padding: 0;
+    font-size: 0.9em;
+}
+
+.foundry-chat-message.assistant .foundry-chat-message-content h3,
+.foundry-chat-message.assistant .foundry-chat-message-content h4,
+.foundry-chat-message.assistant .foundry-chat-message-content h5,
+.foundry-chat-message.assistant .foundry-chat-message-content h6 {
+    margin: 12px 0 8px 0;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+.foundry-chat-message.assistant .foundry-chat-message-content h3 {
+    font-size: 1.1em;
+}
+
+.foundry-chat-message.assistant .foundry-chat-message-content h4 {
+    font-size: 1.05em;
+}
+
+.foundry-chat-message.assistant .foundry-chat-message-content h5,
+.foundry-chat-message.assistant .foundry-chat-message-content h6 {
+    font-size: 1em;
+}
+
+.foundry-chat-message.assistant .foundry-chat-message-content li::before {
+    content: '•';
+    position: absolute;
+    left: 4px;
+    color: rgba(255, 255, 255, 0.95);
+    font-weight: 500;
+    font-size: 16px;
+}
+
+.foundry-chat-message.assistant .foundry-chat-message-content br {
+    line-height: 1.6;
+}
+
+/* User Messages - Dark Grey Bubbles (Right) */
+.foundry-chat-message.user .foundry-chat-message-content {
+    background: #6c757d;
+    color: white;
+    border-radius: 18px 18px 4px 18px;
+    padding: 12px 16px;
+    max-width: 75%;
+    word-wrap: break-word;
+    line-height: 1.5;
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.foundry-chat-message-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+    background: #e9ecef;
+    color: #6c757d;
+    line-height: 1;
+}
+
+.foundry-chat-message.user .foundry-chat-message-avatar {
+    background: #6c757d;
+    color: white;
+}
+
+.foundry-chat-message.assistant .foundry-chat-message-avatar {
+    background: #007bff;
+    color: white;
+}
+
+/* Typing Indicator */
+.foundry-chat-typing {
+    display: flex;
+    gap: 4px;
+    padding: 12px 16px;
+    background: #007bff;
+    border-radius: 18px 18px 18px 4px;
+    max-width: 60px;
+    align-items: center;
+    justify-content: center;
+}
+
+.foundry-chat-typing-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.7);
+    animation: typingDot 1.4s infinite;
+}
+
+.foundry-chat-typing-dot:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.foundry-chat-typing-dot:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes typingDot {
+    0%, 60%, 100% {
+        opacity: 0.4;
+        transform: scale(0.8);
+    }
+    30% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Input Area - Modern Design */
+.foundry-chat-input-area {
+    padding: 16px 20px;
+    background: #ffffff;
+    border-top: 1px solid #e9ecef;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.foundry-chat-input-wrapper {
+    flex: 1;
+    position: relative;
+}
+
+.foundry-chat-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid #ced4da;
+    border-radius: 24px;
+    font-size: 14px;
+    font-weight: 400;
+    outline: none;
+    transition: all 0.2s;
+    background: #ffffff;
+    color: #212529;
+    box-sizing: border-box;
+    letter-spacing: -0.01em;
+}
+
+.foundry-chat-input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.foundry-chat-input::placeholder {
+    color: #adb5bd;
+}
+
+.foundry-chat-send-btn {
+    width: 44px;
+    height: 44px;
+    background: #007bff;
+    border: none;
+    border-radius: 50%;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+}
+
+.foundry-chat-send-btn:hover:not(:disabled) {
+    background: #0056b3;
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
+}
+
+.foundry-chat-send-btn:active:not(:disabled) {
+    transform: scale(0.95);
+}
+
+.foundry-chat-send-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.foundry-chat-send-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* Error Messages */
+.foundry-chat-error {
+    padding: 12px 16px;
+    background: #fff3cd;
+    color: #856404;
+    border-radius: 12px;
+    margin: 8px 0;
+    font-size: 13px;
+    border: 1px solid #ffeaa7;
+}
+
+/* Empty State */
+.foundry-chat-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+    color: #6c757d;
+    padding: 40px 20px;
+}
+
+.foundry-chat-empty-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.6;
+}
+
+.foundry-chat-empty-text {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #868e96;
+    font-weight: 400;
+}
+
+.foundry-chat-empty-text p {
+    margin: 8px 0;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .foundry-chat-window {
+        width: 100%;
+        height: 100%;
+        bottom: 0;
+        right: 0;
+        border-radius: 0;
+    }
+    
+    .foundry-chat-icon {
+        bottom: 16px;
+        right: 16px;
+    }
+}
+
+/* ============================================
+   SPREEDLY-STYLE VARIANT (Alternative Design)
+   ============================================ */
+
+/* Spreedly-style: Large centered modal */
+.foundry-chat-window.spreedly-style {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.95);
+    width: 90%;
+    max-width: 1200px;
+    height: 90vh;
+    max-height: 900px;
+    bottom: auto;
+    right: auto;
+    background: #ffffff;
+    border-radius: 24px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    border: none;
+}
+
+.foundry-chat-window.spreedly-style.active {
+    transform: translate(-50%, -50%) scale(1);
+}
+
+/* Spreedly-style: Header with centered title */
+.foundry-chat-window.spreedly-style .foundry-chat-header {
+    background: transparent;
+    border-bottom: none;
+    padding: 40px 40px 24px 40px;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 16px;
+}
+
+.foundry-chat-window.spreedly-style .foundry-chat-header-content {
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+}
+
+.foundry-chat-window.spreedly-style .foundry-chat-header-avatar {
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-size: 32px;
+    margin-bottom: 8px;
+    line-height: 1;
+    overflow: hidden;
+}
+
+.foundry-chat-window.spreedly-style .foundry-chat-header-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.foundry-chat-window.spreedly-style .foundry-chat-agent-selector-wrapper {
+    margin-left: auto;
+    margin-right: 12px;
+}
+
+/* Markdown formatting styles */
+.foundry-chat-message-content strong {
+    font-weight: 600;
+    color: inherit;
+}
+
+.foundry-chat-message-content em {
+    font-style: italic;
+}
+
+.foundry-chat-message-content code {
+    background: rgba(0, 0, 0, 0.05);
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+}
+
+.foundry-chat-message-content pre {
+    background: rgba(0, 0, 0, 0.05);
+    padding: 12px;
+    border-radius: 6px;
+    overflow-x: auto;
+    margin: 8px 0;
+}
+
+.foundry-chat-message-content pre code {
+    background: none;
+    padding: 0;
+    font-size: 0.9em;
+}
+
+.foundry-chat-message-content h3,
+.foundry-chat-message-content h4,
+.foundry-chat-message-content h5,
+.foundry-chat-message-content h6 {
+    margin: 12px 0 8px 0;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+.foundry-chat-message-content h3 {
+    font-size: 1.1em;
+}
+
+.foundry-chat-message-content h4 {
+    font-size: 1.05em;
+}
+
+.foundry-chat-message-content h5,
+.foundry-chat-message-content h6 {
+    font-size: 1em;
+}
+
+.foundry-chat-message-content ul {
+    margin: 8px 0;
+    padding-left: 20px;
+}
+
+.foundry-chat-message-content li {
+    margin: 4px 0;
+    line-height: 1.5;
+}
+
+/* Action notification animations */
+/* Markdown formatting styles */
+.foundry-chat-message-content strong {
+    font-weight: 600;
+    color: inherit;
+}
+
+.foundry-chat-message-content em {
+    font-style: italic;
+}
+
+.foundry-chat-message-content code {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+}
+
+.foundry-chat-message-content pre {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 12px;
+    border-radius: 6px;
+    overflow-x: auto;
+    margin: 8px 0;
+}
+
+.foundry-chat-message-content pre code {
+    background: none;
+    padding: 0;
+    font-size: 0.9em;
+}
+
+.foundry-chat-message-content h3,
+.foundry-chat-message-content h4,
+.foundry-chat-message-content h5,
+.foundry-chat-message-content h6 {
+    margin: 12px 0 8px 0;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+.foundry-chat-message-content h3 {
+    font-size: 1.1em;
+}
+
+.foundry-chat-message-content h4 {
+    font-size: 1.05em;
+}
+
+.foundry-chat-message-content h5,
+.foundry-chat-message-content h6 {
+    font-size: 1em;
+}
+
+/* Action notification animations */
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+.foundry-chat-window.spreedly-style .foundry-chat-header-info {
+    align-items: center;
+    gap: 8px;
+}
+
+.foundry-chat-window.spreedly-style .foundry-chat-header-name {
+    font-size: 28px;
+    font-weight: 600;
+    color: #212529;
+    line-height: 1.3;
+    margin-bottom: 4px;
+}
+
+.foundry-chat-window.spreedly-style .foundry-chat-header-title {
+    font-size: 15px;
+    color: #666666;
+    line-height: 1.6;
+    font-weight: 400;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.foundry-chat-window.spreedly-style .foundry-chat-header-options {
+    display: none;
+}
+
+.foundry-chat-window.spreedly-style .foundry-chat-header-reset {
+    margin-right: 12px;
+}
+
+.foundry-chat-window.spreedly-style .foundry-chat-close-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 36px;
+    height: 36px;
+    font-size: 24px;
+    color: #666666;
+}
+
+.foundry-chat-window.spreedly-style .foundry-chat-close-btn:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: #212529;
+}
+
+/* Spreedly-style: Messages area */
+.foundry-chat-window.spreedly-style .foundry-chat-messages {
+    padding: 24px 40px;
+    background: #ffffff;
+    flex: 1;
+    overflow-y: auto;
+}
+
+/* Spreedly-style: Message bubbles - more spacious */
+.foundry-chat-window.spreedly-style .foundry-chat-message {
+    margin-bottom: 20px;
+}
+
+.foundry-chat-window.spreedly-style .foundry-chat-message.assistant .foundry-chat-message-content {
+    max-width: 85%;
+    padding: 14px 18px;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+.foundry-chat-window.spreedly-style .foundry-chat-message.user .foundry-chat-message-content {
+    max-width: 85%;
+    padding: 14px 18px;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+/* Spreedly-style: Input area - large rounded bar at bottom */
+.foundry-chat-window.spreedly-style .foundry-chat-input-area {
+    padding: 20px 40px 32px 40px;
+    background: #ffffff;
+    border-top: 1px solid #e9ecef;
+    border-radius: 0 0 24px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.foundry-chat-window.spreedly-style .foundry-chat-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #ffffff;
+    border: 1px solid #dddddd;
+    border-radius: 36px;
+    padding: 8px 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.foundry-chat-window.spreedly-style .foundry-chat-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 10px 8px;
+    border-radius: 0;
+    font-size: 15px;
+    box-shadow: none;
+}
+
+.foundry-chat-window.spreedly-style .foundry-chat-input:focus {
+    box-shadow: none;
+    border: none;
+}
+
+.foundry-chat-window.spreedly-style .foundry-chat-send-btn {
+    width: 48px;
+    height: 48px;
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+/* Spreedly-style: Empty state */
+.foundry-chat-window.spreedly-style .foundry-chat-empty {
+    padding: 60px 40px;
+}
+
+.foundry-chat-window.spreedly-style .foundry-chat-empty-icon {
+    font-size: 64px;
+    margin-bottom: 24px;
+}
+
+.foundry-chat-window.spreedly-style .foundry-chat-empty-text {
+    font-size: 15px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Spreedly-style: Suggested questions section */
+.foundry-chat-suggestions {
+    padding: 0 40px 24px 40px;
+    display: none;
+}
+
+.foundry-chat-window.spreedly-style .foundry-chat-suggestions {
+    display: block;
+}
+
+.foundry-chat-suggestions-label {
+    font-size: 14px;
+    color: #aaaaaa;
+    margin-bottom: 12px;
+    font-weight: 400;
+}
+
+.foundry-chat-suggestions-list {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.foundry-chat-suggestion-card {
+    flex: 1;
+    min-width: 280px;
+    max-width: 350px;
+    background: #f8f9fa;
+    border: 1px solid #dddddd;
+    border-radius: 8px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.foundry-chat-suggestion-card:hover {
+    background: #f0f2f5;
+    border-color: #007bff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.foundry-chat-suggestion-icon {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1;
+    overflow: hidden;
+}
+
+.foundry-chat-suggestion-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.foundry-chat-suggestion-text {
+    flex: 1;
+    font-size: 15px;
+    color: #333333;
+    line-height: 1.5;
+    font-weight: 400;
+}
+
+/* Spreedly-style: Model selector (optional, can be hidden) */
+.foundry-chat-model-selector {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    padding: 0 16px;
+    font-size: 15px;
+    color: #666666;
+}
+
+.foundry-chat-window.spreedly-style .foundry-chat-model-selector {
+    display: flex;
+}
+
+.foundry-chat-model-icon {
+    width: 20px;
+    height: 20px;
+    color: #666666;
+}
+
+/* Spreedly-style: Reset button */
+.foundry-chat-reset-btn {
+    display: none;
+    background: transparent;
+    border: none;
+    color: #666666;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: all 0.2s;
+    align-items: center;
+    gap: 6px;
+}
+
+.foundry-chat-window.spreedly-style .foundry-chat-reset-btn {
+    display: flex;
+}
+
+.foundry-chat-reset-btn:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: #212529;
+}
+
+.foundry-chat-reset-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Spreedly-style: Input area layout adjustments */
+.foundry-chat-window.spreedly-style .foundry-chat-input-area {
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+}
+
+.foundry-chat-window.spreedly-style .foundry-chat-input-wrapper {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Style toggle button */
+.foundry-chat-style-toggle {
+    position: fixed;
+    bottom: 90px;
+    right: 24px;
+    width: 48px;
+    height: 48px;
+    background: #6c757d;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 999;
+    transition: all 0.3s ease;
+    color: white;
+    border: none;
+    font-size: 20px;
+}
+
+.foundry-chat-style-toggle:hover {
+    background: #5a6268;
+    transform: scale(1.05);
+}
+
+.foundry-chat-style-toggle:active {
+    transform: scale(0.95);
+}
+
+/* Spreedly-style mobile responsive */
+@media (max-width: 768px) {
+    .foundry-chat-window.spreedly-style {
+        width: 100%;
+        height: 100%;
+        max-width: 100%;
+        max-height: 100%;
+        top: 0;
+        left: 0;
+        transform: translate(0, 0) scale(1);
+        border-radius: 0;
+    }
+    
+    .foundry-chat-window.spreedly-style.active {
+        transform: translate(0, 0) scale(1);
+    }
+    
+    .foundry-chat-window.spreedly-style .foundry-chat-header {
+        padding: 24px 20px 16px 20px;
+    }
+    
+    .foundry-chat-window.spreedly-style .foundry-chat-messages {
+        padding: 20px;
+    }
+    
+    .foundry-chat-window.spreedly-style .foundry-chat-input-area {
+        padding: 16px 20px;
+    }
+    
+    .foundry-chat-suggestions {
+        padding: 0 20px 16px 20px;
+    }
+    
+    .foundry-chat-suggestions-list {
+        flex-direction: column;
+    }
+    
+    .foundry-chat-suggestion-card {
+        max-width: 100%;
+    }
+}

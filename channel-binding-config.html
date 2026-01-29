@@ -320,7 +320,7 @@
                                 <div class="form-group full-width">
                                     <label for="merchant-company-name">公司名 <span class="required">*</span></label>
                                     <input type="text" id="merchant-company-name" name="companyName" required 
-                                           placeholder="请输入公司名" class="form-input">
+                                           value="STAR SAAS LIMITED" readonly class="form-input">
                                 </div>
                                 <div class="form-group">
                                     <label for="merchant-company-full-name-en">商户公司全称 (英文) <span class="required">*</span></label>
@@ -333,8 +333,8 @@
                                            placeholder="请输入商户公司简称（英文）" class="form-input">
                                 </div>
                                 <div class="form-group">
-                                    <label for="merchant-company-name">商户名称 <span class="required">*</span></label>
-                                    <input type="text" id="merchant-company-name" name="merchantName" required 
+                                    <label for="merchant-name">商户名称 <span class="required">*</span></label>
+                                    <input type="text" id="merchant-name" name="merchantName" required 
                                            placeholder="请输入商户名称" class="form-input">
                                 </div>
                             </div>
@@ -411,58 +411,79 @@
                                 </div>
                             </div>
                             
-                            <!-- Default Settings Remark -->
+                            <!-- Default Settings Remark: show by default, edit on "编辑" click -->
                             <div class="default-settings-remark" style="margin-top: 24px; padding: 16px; background: #f5f5f5; border-radius: 8px;">
-                                <div style="display: flex; align-items: flex-start; margin-bottom: 16px;">
-                                    <div style="width: 20px; height: 20px; border-radius: 50%; background: #4A90E2; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-right: 8px;">
-                                        <span style="color: white; font-size: 12px; font-weight: bold;">i</span>
+                                <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
+                                    <div style="display: flex; align-items: flex-start;">
+                                        <div style="width: 20px; height: 20px; border-radius: 50%; background: #4A90E2; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-right: 8px;">
+                                            <span style="color: white; font-size: 12px; font-weight: bold;">i</span>
+                                        </div>
+                                        <p style="margin: 0; font-size: 13px; color: #333; line-height: 1.5;">
+                                            备注：以下信息为系统默认设置。如需修改，请在完成快速配置后前往「商户维护」进行调整。
+                                        </p>
                                     </div>
-                                    <p style="margin: 0; font-size: 13px; color: #333; line-height: 1.5;">
-                                        备注：以下信息为系统默认设置。如需修改，请在完成快速配置后前往「商户维护」进行调整。
-                                    </p>
+                                    <button type="button" class="btn btn-secondary" id="default-settings-edit-btn" onclick="toggleDefaultSettingsEdit(true)" style="flex-shrink: 0; padding: 4px 10px; font-size: 12px; line-height: 1.2;">编辑</button>
                                 </div>
-                                <div class="default-settings-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px 32px; font-size: 13px; color: #333;">
-                                    <!-- Left Column -->
-                                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                                        <span>是否开启 3D</span>
-                                        <span style="color: #4A90E2; font-weight: 500;">是</span>
+                                <!-- Display-only view (default visible) -->
+                                <div id="default-settings-display" class="default-settings-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px 32px; font-size: 13px; color: #333;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;"><span>是否开启 3D</span><span id="disp-enable-3d" style="color: #4A90E2; font-weight: 500;">是</span></div>
+                                    <div style="display: flex; justify-content: space-between; align-items: center;"><span>是否开启 3D 2.0</span><span id="disp-enable-3d2" style="color: #4A90E2; font-weight: 500;">是</span></div>
+                                    <div style="display: flex; justify-content: space-between; align-items: center;"><span>是否开启本地 Token</span><span id="disp-enable-local-token" style="color: #4A90E2; font-weight: 500;">是</span></div>
+                                    <div style="display: flex; justify-content: space-between; align-items: center;"><span>是否分数商户订单号到渠道</span><span id="disp-score-order-to-channel" style="color: #666;">否</span></div>
+                                    <div style="display: flex; justify-content: space-between; align-items: center;"><span>是否发送账单地址给渠道</span><span id="disp-send-billing-address" style="color: #4A90E2; font-weight: 500;">是</span></div>
+                                    <div style="display: flex; justify-content: space-between; align-items: center;"><span>是否取消自动扣款</span><span id="disp-cancel-auto-deduction" style="color: #666;">否</span></div>
+                                    <div style="display: flex; justify-content: space-between; align-items: center;"><span>自动做capture的时间</span><span id="disp-auto-capture-hours" style="color: #4A90E2; font-weight: 500;">0.5 小时</span></div>
+                                    <div style="display: flex; justify-content: space-between; align-items: center;"><span>使用平台交易订单号</span><span id="disp-use-platform-order-no" style="color: #4A90E2; font-weight: 500;">是</span></div>
+                                    <div style="display: flex; justify-content: space-between; align-items: center;"><span>发送账单描述</span><span id="disp-send-bill-desc" style="color: #4A90E2; font-weight: 500;">直接发送</span></div>
+                                    <div style="display: flex; justify-content: space-between; align-items: center;"><span>发送产品信息</span><span id="disp-send-product-info" style="color: #4A90E2; font-weight: 500;">是</span></div>
+                                </div>
+                                <!-- Editable view (hidden by default) -->
+                                <div id="default-settings-edit" style="display: none;">
+                                    <div class="default-settings-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px 32px; font-size: 13px; color: #333; margin-bottom: 4px;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px;">
+                                            <label for="default-enable-3d" style="margin: 0;">是否开启 3D</label>
+                                            <select id="default-enable-3d" name="defaultEnable3d" class="form-select" style="width: auto; min-width: 72px; padding: 4px 8px; font-size: 12px; line-height: 1.2; height: 26px;"><option value="yes" selected>是</option><option value="no">否</option></select>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px;">
+                                            <label for="default-enable-3d2" style="margin: 0;">是否开启 3D 2.0</label>
+                                            <select id="default-enable-3d2" name="defaultEnable3d2" class="form-select" style="width: auto; min-width: 72px; padding: 4px 8px; font-size: 12px; line-height: 1.2; height: 26px;"><option value="yes" selected>是</option><option value="no">否</option></select>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px;">
+                                            <label for="default-enable-local-token" style="margin: 0;">是否开启本地 Token</label>
+                                            <select id="default-enable-local-token" name="defaultEnableLocalToken" class="form-select" style="width: auto; min-width: 72px; padding: 4px 8px; font-size: 12px; line-height: 1.2; height: 26px;"><option value="yes" selected>是</option><option value="no">否</option></select>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px;">
+                                            <label for="default-score-order-to-channel" style="margin: 0;">是否分数商户订单号到渠道</label>
+                                            <select id="default-score-order-to-channel" name="defaultScoreOrderToChannel" class="form-select" style="width: auto; min-width: 72px; padding: 4px 8px; font-size: 12px; line-height: 1.2; height: 26px;"><option value="yes">是</option><option value="no" selected>否</option></select>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px;">
+                                            <label for="default-send-billing-address" style="margin: 0;">是否发送账单地址给渠道</label>
+                                            <select id="default-send-billing-address" name="defaultSendBillingAddress" class="form-select" style="width: auto; min-width: 72px; padding: 4px 8px; font-size: 12px; line-height: 1.2; height: 26px;"><option value="yes" selected>是</option><option value="no">否</option></select>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px;">
+                                            <label for="default-cancel-auto-deduction" style="margin: 0;">是否取消自动扣款</label>
+                                            <select id="default-cancel-auto-deduction" name="defaultCancelAutoDeduction" class="form-select" style="width: auto; min-width: 72px; padding: 4px 8px; font-size: 12px; line-height: 1.2; height: 26px;"><option value="yes">是</option><option value="no" selected>否</option></select>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px;">
+                                            <label for="default-auto-capture-hours" style="margin: 0;">自动做capture的时间</label>
+                                            <span style="display: flex; align-items: center; gap: 4px;"><input type="number" id="default-auto-capture-hours" name="defaultAutoCaptureHours" class="form-input" value="0.5" step="0.1" min="0" style="width: 56px; padding: 4px 8px; font-size: 12px; line-height: 1.2; height: 26px; box-sizing: border-box;"><span>小时</span></span>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px;">
+                                            <label for="default-use-platform-order-no" style="margin: 0;">使用平台交易订单号</label>
+                                            <select id="default-use-platform-order-no" name="defaultUsePlatformOrderNo" class="form-select" style="width: auto; min-width: 72px; padding: 4px 8px; font-size: 12px; line-height: 1.2; height: 26px;"><option value="yes" selected>是</option><option value="no">否</option></select>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px;">
+                                            <label for="default-send-bill-desc" style="margin: 0;">发送账单描述</label>
+                                            <select id="default-send-bill-desc" name="defaultSendBillDesc" class="form-select" style="width: auto; min-width: 100px; padding: 4px 8px; font-size: 12px; line-height: 1.2; height: 26px;"><option value="direct" selected>直接发送</option><option value="no">不发送</option></select>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px;">
+                                            <label for="default-send-product-info" style="margin: 0;">发送产品信息</label>
+                                            <select id="default-send-product-info" name="defaultSendProductInfo" class="form-select" style="width: auto; min-width: 72px; padding: 4px 8px; font-size: 12px; line-height: 1.2; height: 26px;"><option value="yes" selected>是</option><option value="no">否</option></select>
+                                        </div>
                                     </div>
-                                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                                        <span>是否开启 3D 2.0</span>
-                                        <span style="color: #4A90E2; font-weight: 500;">是</span>
-                                    </div>
-                                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                                        <span>是否开启本地 Token</span>
-                                        <span style="color: #4A90E2; font-weight: 500;">是</span>
-                                    </div>
-                                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                                        <span>是否分数商户订单号到渠道</span>
-                                        <span style="color: #666;">否</span>
-                                    </div>
-                                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                                        <span>是否发送账单地址给渠道</span>
-                                        <span style="color: #4A90E2; font-weight: 500;">是</span>
-                                    </div>
-                                    <!-- Right Column -->
-                                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                                        <span>是否取消自动扣款</span>
-                                        <span style="color: #666;">否</span>
-                                    </div>
-                                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                                        <span>自动做capture的时间</span>
-                                        <span style="color: #4A90E2; font-weight: 500;">0.5 小时</span>
-                                    </div>
-                                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                                        <span>使用平台交易订单号</span>
-                                        <span style="color: #4A90E2; font-weight: 500;">是</span>
-                                    </div>
-                                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                                        <span>发送账单描述</span>
-                                        <span style="color: #4A90E2; font-weight: 500;">是</span>
-                                    </div>
-                                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                                        <span>发送产品信息</span>
-                                        <span style="color: #4A90E2; font-weight: 500;">直接发送</span>
+                                    <div style="display: flex; gap: 6px; margin-top: 4px; align-items: center;">
+                                        <button type="button" class="btn btn-primary" onclick="saveDefaultSettings()" style="padding: 4px 10px; font-size: 12px; line-height: 1.2;">保存</button>
+                                        <button type="button" class="btn btn-secondary" onclick="toggleDefaultSettingsEdit(false)" style="padding: 4px 10px; font-size: 12px; line-height: 1.2;">取消</button>
                                     </div>
                                 </div>
                             </div>
@@ -472,7 +493,7 @@
                         <div class="form-section">
                             <h3 class="section-title">网关接入号通道绑定</h3>
                             <div class="info-box" style="margin-bottom: 20px;">
-                                <p><strong>提示：</strong>配置支付方式及对应卡种。如果有多家渠道的话只需要配置其中一家对应的卡种即可。</p>
+                                <p><strong>提示：</strong>配置支付方式及对应卡种。每个卡种仅能绑定一个渠道，请选择一个渠道。</p>
                             </div>
                             <div class="form-grid">
                                 <div class="form-group full-width">
@@ -531,39 +552,16 @@
                                     </div>
                                 </div>
                                 <div class="form-group" id="channels-group" style="display: none;">
-                                    <label for="merchant-channels">渠道 <span class="required">*</span></label>
-                                    <div class="multi-select-wrapper">
-                                        <div class="multi-select-display" onclick="toggleMultiSelect('channels')">
-                                            <span class="multi-select-placeholder" id="channels-placeholder">请选择渠道</span>
-                                            <span class="multi-select-arrow" id="channels-arrow">▼</span>
-                                        </div>
-                                        <div class="multi-select-dropdown" id="channels-dropdown" style="display: none;">
-                                            <div class="multi-select-search">
-                                                <input type="text" id="channels-search" class="multi-select-search-input" 
-                                                       placeholder="搜索..." onkeyup="filterMultiSelect('channels', this.value)"
-                                                       onclick="event.stopPropagation()">
-                                            </div>
-                                            <div class="multi-select-options" id="channels-options">
-                                                <div class="multi-select-option">
-                                                    <input type="checkbox" id="channel-ysepay" value="ysepay" onchange="updateMultiSelect('channels')">
-                                                    <label for="channel-ysepay">YSEPAY</label>
-                                                </div>
-                                                <div class="multi-select-option">
-                                                    <input type="checkbox" id="channel-rumble" value="rumble" onchange="updateMultiSelect('channels')">
-                                                    <label for="channel-rumble">RUMBLE</label>
-                                                </div>
-                                                <div class="multi-select-option">
-                                                    <input type="checkbox" id="channel-evonet" value="evonet" onchange="updateMultiSelect('channels')">
-                                                    <label for="channel-evonet">EVONET</label>
-                                                </div>
-                                                <div class="multi-select-option">
-                                                    <input type="checkbox" id="channel-paysaas" value="paysaas" onchange="updateMultiSelect('channels')">
-                                                    <label for="channel-paysaas">PAYSAAS</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <input type="hidden" id="merchant-channels" name="channels" required>
-                                    </div>
+                                    <label for="merchant-channel-select">渠道 <span class="required">*</span></label>
+                                    <select id="merchant-channel-select" class="form-select" onchange="updateChannelSelect()">
+                                        <option value="">请选择渠道</option>
+                                        <option value="ysepay">YSEPAY</option>
+                                        <option value="rumble">RUMBLE</option>
+                                        <option value="evonet">EVONET</option>
+                                        <option value="paysaas">PAYSAAS</option>
+                                    </select>
+                                    <small class="form-hint">每个卡种仅能绑定一个渠道</small>
+                                    <input type="hidden" id="merchant-channels" name="channels" required>
                                 </div>
                                 <div class="form-group full-width" id="build-button-group" style="display: none; margin-top: 8px;">
                                     <button type="button" class="btn btn-primary" onclick="buildChannelBinding()" id="build-channel-binding-btn">
@@ -2069,15 +2067,13 @@
                 document.getElementById('channel-binding-results').style.display = 'none';
                 // Clear selections when hidden
                 const cardTypesCheckboxes = document.querySelectorAll('#card-types-dropdown input[type="checkbox"]');
-                const channelsCheckboxes = document.querySelectorAll('#channels-dropdown input[type="checkbox"]');
                 cardTypesCheckboxes.forEach(cb => cb.checked = false);
-                channelsCheckboxes.forEach(cb => cb.checked = false);
                 document.getElementById('merchant-card-types').value = '';
                 document.getElementById('merchant-channels').value = '';
                 document.getElementById('card-types-placeholder').textContent = '请选择卡种';
                 document.getElementById('card-types-placeholder').style.color = '#999';
-                document.getElementById('channels-placeholder').textContent = '请选择渠道';
-                document.getElementById('channels-placeholder').style.color = '#999';
+                const channelSelect = document.getElementById('merchant-channel-select');
+                if (channelSelect) channelSelect.value = '';
             }
         }
 
@@ -2200,7 +2196,7 @@
                 companyName: document.getElementById('merchant-company-name').value,
                 companyFullNameEn: document.getElementById('merchant-company-full-name-en').value,
                 companyShortNameEn: document.getElementById('merchant-company-short-name-en').value,
-                merchantName: document.getElementById('merchant-company-name')?.value || document.querySelector('#channel-binding-tab select#merchant-name')?.value || '',
+                merchantName: document.getElementById('merchant-name')?.value || document.querySelector('#channel-binding-tab select#merchant-name')?.value || '',
                 loginAccount: document.getElementById('merchant-login-account').value,
                 loginUserName: document.getElementById('merchant-login-user-name').value,
                 loginPassword: document.getElementById('merchant-login-password').value,
@@ -2211,7 +2207,18 @@
                 bindingInterfaceType: document.getElementById('merchant-binding-interface-type').value,
                 paymentMethod: document.getElementById('merchant-payment-method').value,
                 cardTypes: JSON.parse(document.getElementById('merchant-card-types').value || '[]'),
-                channels: JSON.parse(document.getElementById('merchant-channels').value || '[]')
+                channels: JSON.parse(document.getElementById('merchant-channels').value || '[]'),
+                // Default settings (editable)
+                defaultEnable3d: document.getElementById('default-enable-3d').value,
+                defaultEnable3d2: document.getElementById('default-enable-3d2').value,
+                defaultEnableLocalToken: document.getElementById('default-enable-local-token').value,
+                defaultScoreOrderToChannel: document.getElementById('default-score-order-to-channel').value,
+                defaultSendBillingAddress: document.getElementById('default-send-billing-address').value,
+                defaultCancelAutoDeduction: document.getElementById('default-cancel-auto-deduction').value,
+                defaultAutoCaptureHours: document.getElementById('default-auto-capture-hours').value,
+                defaultUsePlatformOrderNo: document.getElementById('default-use-platform-order-no').value,
+                defaultSendBillDesc: document.getElementById('default-send-bill-desc').value,
+                defaultSendProductInfo: document.getElementById('default-send-product-info').value
             };
 
             // Show loading
@@ -2610,36 +2617,61 @@ KEY 值: ${formData.keyValue}
         window.copyMerchantConfigInfo = copyMerchantConfigInfo;
         window.copyMerchantField = copyMerchantField;
 
+        // Generate random 30-char alphanumeric for KEY 值
+        function generateRandomKeyValue(length) {
+            length = length || 30;
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let result = '';
+            const randomValues = new Uint8Array(length);
+            crypto.getRandomValues(randomValues);
+            for (let i = 0; i < length; i++) result += chars[randomValues[i] % chars.length];
+            return result;
+        }
+
         // Reset Merchant Form
         function resetMerchantForm() {
             const form = document.getElementById('merchantConfigForm');
             if (form) {
                 form.reset();
                 // Reset default values
+                document.getElementById('merchant-company-name').value = 'STAR SAAS LIMITED';
+                document.getElementById('merchant-key-value').value = generateRandomKeyValue(30);
                 document.getElementById('merchant-settlement-currency').value = 'USD';
                 document.getElementById('merchant-binding-interface-type').value = '3-party';
+                // Reset default settings (editable section)
+                document.getElementById('default-enable-3d').value = 'yes';
+                document.getElementById('default-enable-3d2').value = 'yes';
+                document.getElementById('default-enable-local-token').value = 'yes';
+                document.getElementById('default-score-order-to-channel').value = 'no';
+                document.getElementById('default-send-billing-address').value = 'yes';
+                document.getElementById('default-cancel-auto-deduction').value = 'no';
+                document.getElementById('default-auto-capture-hours').value = '0.5';
+                document.getElementById('default-use-platform-order-no').value = 'yes';
+                document.getElementById('default-send-bill-desc').value = 'direct';
+                document.getElementById('default-send-product-info').value = 'yes';
+                lastSavedDefaultSettings = getDefaultSettingsFromControls();
+                updateDefaultSettingsDisplay();
+                document.getElementById('default-settings-display').style.display = 'grid';
+                const defaultEditEl = document.getElementById('default-settings-edit');
+                if (defaultEditEl) defaultEditEl.style.display = 'none';
+                const defaultEditBtn = document.getElementById('default-settings-edit-btn');
+                if (defaultEditBtn) { defaultEditBtn.textContent = '编辑'; defaultEditBtn.style.display = ''; }
                 // Reset payment method and hide dependent fields
                 document.getElementById('merchant-payment-method').value = '';
-                // Reset card types and channels
+                // Reset card types and channel
                 const cardTypesCheckboxes = document.querySelectorAll('#card-types-dropdown input[type="checkbox"]');
-                const channelsCheckboxes = document.querySelectorAll('#channels-dropdown input[type="checkbox"]');
                 cardTypesCheckboxes.forEach(cb => cb.checked = false);
-                channelsCheckboxes.forEach(cb => cb.checked = false);
                 document.getElementById('card-types-placeholder').textContent = '请选择卡种';
                 document.getElementById('card-types-placeholder').style.color = '#999';
-                document.getElementById('channels-placeholder').textContent = '请选择渠道';
-                document.getElementById('channels-placeholder').style.color = '#999';
-                document.getElementById('merchant-card-types').value = '';
+                const channelSelect = document.getElementById('merchant-channel-select');
+                if (channelSelect) channelSelect.value = '';
                 document.getElementById('merchant-channels').value = '';
-                // Reset search inputs
+                document.getElementById('merchant-card-types').value = '';
+                // Reset search input for card types
                 document.getElementById('card-types-search').value = '';
-                document.getElementById('channels-search').value = '';
-                // Reset filter display
+                // Reset filter display for card types
                 document.querySelectorAll('#card-types-options .multi-select-option').forEach(opt => opt.style.display = 'flex');
-                document.querySelectorAll('#channels-options .multi-select-option').forEach(opt => opt.style.display = 'flex');
-                // Reset arrows
                 document.getElementById('card-types-arrow').textContent = '▼';
-                document.getElementById('channels-arrow').textContent = '▼';
                 // Hide card types and channels groups
                 document.getElementById('card-types-group').style.display = 'none';
                 document.getElementById('channels-group').style.display = 'none';
@@ -2653,6 +2685,85 @@ KEY 值: ${formData.keyValue}
                 document.getElementById('merchant-login-password').value = '';
                 document.getElementById('merchant-confirm-password').value = '';
             }
+        }
+
+        // Default settings: show by default, edit on "编辑" click
+        let lastSavedDefaultSettings = null;
+
+        function getDefaultSettingsFromControls() {
+            const el = id => document.getElementById(id);
+            return {
+                enable3d: el('default-enable-3d')?.value || 'yes',
+                enable3d2: el('default-enable-3d2')?.value || 'yes',
+                enableLocalToken: el('default-enable-local-token')?.value || 'yes',
+                scoreOrderToChannel: el('default-score-order-to-channel')?.value || 'no',
+                sendBillingAddress: el('default-send-billing-address')?.value || 'yes',
+                cancelAutoDeduction: el('default-cancel-auto-deduction')?.value || 'no',
+                autoCaptureHours: el('default-auto-capture-hours')?.value || '0.5',
+                usePlatformOrderNo: el('default-use-platform-order-no')?.value || 'yes',
+                sendBillDesc: el('default-send-bill-desc')?.value || 'direct',
+                sendProductInfo: el('default-send-product-info')?.value || 'yes'
+            };
+        }
+
+        function applyDefaultSettingsToControls(settings) {
+            if (!settings) return;
+            const el = id => document.getElementById(id);
+            if (el('default-enable-3d')) el('default-enable-3d').value = settings.enable3d;
+            if (el('default-enable-3d2')) el('default-enable-3d2').value = settings.enable3d2;
+            if (el('default-enable-local-token')) el('default-enable-local-token').value = settings.enableLocalToken;
+            if (el('default-score-order-to-channel')) el('default-score-order-to-channel').value = settings.scoreOrderToChannel;
+            if (el('default-send-billing-address')) el('default-send-billing-address').value = settings.sendBillingAddress;
+            if (el('default-cancel-auto-deduction')) el('default-cancel-auto-deduction').value = settings.cancelAutoDeduction;
+            if (el('default-auto-capture-hours')) el('default-auto-capture-hours').value = settings.autoCaptureHours;
+            if (el('default-use-platform-order-no')) el('default-use-platform-order-no').value = settings.usePlatformOrderNo;
+            if (el('default-send-bill-desc')) el('default-send-bill-desc').value = settings.sendBillDesc;
+            if (el('default-send-product-info')) el('default-send-product-info').value = settings.sendProductInfo;
+        }
+
+        function updateDefaultSettingsDisplay() {
+            const s = lastSavedDefaultSettings || getDefaultSettingsFromControls();
+            const yesNo = v => (v === 'yes' ? '是' : '否');
+            const billDesc = v => (v === 'direct' ? '直接发送' : '不发送');
+            const el = id => document.getElementById(id);
+            if (el('disp-enable-3d')) el('disp-enable-3d').textContent = yesNo(s.enable3d);
+            if (el('disp-enable-3d2')) el('disp-enable-3d2').textContent = yesNo(s.enable3d2);
+            if (el('disp-enable-local-token')) el('disp-enable-local-token').textContent = yesNo(s.enableLocalToken);
+            if (el('disp-score-order-to-channel')) el('disp-score-order-to-channel').textContent = yesNo(s.scoreOrderToChannel);
+            if (el('disp-send-billing-address')) el('disp-send-billing-address').textContent = yesNo(s.sendBillingAddress);
+            if (el('disp-cancel-auto-deduction')) el('disp-cancel-auto-deduction').textContent = yesNo(s.cancelAutoDeduction);
+            if (el('disp-auto-capture-hours')) el('disp-auto-capture-hours').textContent = (s.autoCaptureHours || '0.5') + ' 小时';
+            if (el('disp-use-platform-order-no')) el('disp-use-platform-order-no').textContent = yesNo(s.usePlatformOrderNo);
+            if (el('disp-send-bill-desc')) el('disp-send-bill-desc').textContent = billDesc(s.sendBillDesc);
+            if (el('disp-send-product-info')) el('disp-send-product-info').textContent = yesNo(s.sendProductInfo);
+        }
+
+        function toggleDefaultSettingsEdit(showEdit) {
+            const displayEl = document.getElementById('default-settings-display');
+            const editEl = document.getElementById('default-settings-edit');
+            const editBtn = document.getElementById('default-settings-edit-btn');
+            if (showEdit) {
+                lastSavedDefaultSettings = getDefaultSettingsFromControls();
+                if (displayEl) displayEl.style.display = 'none';
+                if (editEl) editEl.style.display = 'block';
+                if (editBtn) editBtn.style.display = 'none';
+            } else {
+                applyDefaultSettingsToControls(lastSavedDefaultSettings);
+                updateDefaultSettingsDisplay();
+                if (displayEl) displayEl.style.display = 'grid';
+                if (editEl) editEl.style.display = 'none';
+                if (editBtn) { editBtn.style.display = ''; editBtn.textContent = '编辑'; }
+            }
+        }
+
+        function saveDefaultSettings() {
+            lastSavedDefaultSettings = getDefaultSettingsFromControls();
+            updateDefaultSettingsDisplay();
+            document.getElementById('default-settings-display').style.display = 'grid';
+            document.getElementById('default-settings-edit').style.display = 'none';
+            const editBtn = document.getElementById('default-settings-edit-btn');
+            if (editBtn) { editBtn.style.display = ''; editBtn.textContent = '编辑'; }
+            showMerchantMessage('默认设置已保存', 'success');
         }
 
         // Show message helper for merchant config
@@ -3058,38 +3169,51 @@ KEY 值: ${formData.keyValue}
             const placeholder = document.getElementById(`${type}-placeholder`);
             const hiddenInput = document.getElementById(`merchant-${type}`);
             
-            // Get display names for channels
-            const channelNames = {
-                'ysepay': 'YSEPAY',
-                'rumble': 'RUMBLE',
-                'evonet': 'EVONET',
-                'paysaas': 'PAYSAAS'
-            };
-            
             if (selected.length === 0) {
-                placeholder.textContent = type === 'card-types' ? '请选择卡种' : '请选择渠道';
+                placeholder.textContent = '请选择卡种';
                 placeholder.style.color = '#999';
                 hiddenInput.value = '';
                 hiddenInput.setCustomValidity('请至少选择一个选项');
             } else {
-                // For channels, show display names
-                const displayText = type === 'channels' 
-                    ? selected.map(v => channelNames[v] || v).join(', ')
-                    : selected.join(', ');
-                placeholder.textContent = displayText;
+                placeholder.textContent = selected.join(', ');
                 placeholder.style.color = '#333';
                 hiddenInput.value = JSON.stringify(selected);
                 hiddenInput.setCustomValidity('');
             }
             
-            // Show/hide build button based on channel selection
-            if (type === 'channels') {
-                const buildButtonGroup = document.getElementById('build-button-group');
-                if (selected.length > 0) {
+            // Show/hide build button when card types change (need both card types and channel)
+            updateChannelBuildButtonVisibility();
+        }
+
+        // Channel single-select: one channel per 卡种 (stored as single-item array for compatibility)
+        function updateChannelSelect() {
+            const select = document.getElementById('merchant-channel-select');
+            const hiddenInput = document.getElementById('merchant-channels');
+            if (!select || !hiddenInput) return;
+            const value = select.value;
+            if (value) {
+                hiddenInput.value = JSON.stringify([value]);
+                hiddenInput.setCustomValidity('');
+            } else {
+                hiddenInput.value = '';
+                hiddenInput.setCustomValidity('请选择渠道');
+            }
+            updateChannelBuildButtonVisibility();
+        }
+
+        function updateChannelBuildButtonVisibility() {
+            const buildButtonGroup = document.getElementById('build-button-group');
+            const cardTypesValue = document.getElementById('merchant-card-types').value;
+            const channelSelect = document.getElementById('merchant-channel-select');
+            const hasCardTypes = cardTypesValue && JSON.parse(cardTypesValue || '[]').length > 0;
+            const hasChannel = channelSelect && channelSelect.value;
+            if (buildButtonGroup) {
+                if (hasCardTypes && hasChannel) {
                     buildButtonGroup.style.display = 'block';
                 } else {
                     buildButtonGroup.style.display = 'none';
-                    document.getElementById('channel-binding-results').style.display = 'none';
+                    const resultsEl = document.getElementById('channel-binding-results');
+                    if (resultsEl) resultsEl.style.display = 'none';
                 }
             }
         }
@@ -3308,6 +3432,9 @@ KEY 值: ${formData.keyValue}
         window.toggleMultiSelect = toggleMultiSelect;
         window.updateMultiSelect = updateMultiSelect;
         window.filterMultiSelect = filterMultiSelect;
+        window.updateChannelSelect = updateChannelSelect;
+        window.toggleDefaultSettingsEdit = toggleDefaultSettingsEdit;
+        window.saveDefaultSettings = saveDefaultSettings;
         window.buildChannelBinding = buildChannelBinding;
         window.deleteChannelBinding = deleteChannelBinding;
         window.deleteSelectedChannelBindings = deleteSelectedChannelBindings;

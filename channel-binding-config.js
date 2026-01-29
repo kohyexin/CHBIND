@@ -18,7 +18,12 @@
         ysepay: {
             paymentType: 'credit_card',
             paymentMethods: [{ value: 'all', label: '全部', hint: '信用卡正常情况下绑定 Visa, Master, Maestro 等' }],
-            currencies: [{ value: 'USD', label: 'USD - 美元' }],
+            currencies: [
+                { value: 'USD', label: 'USD - 美元' },
+                { value: 'HKD', label: 'HKD - 港币' },
+                { value: 'EUR', label: 'EUR - 欧元' },
+                { value: 'JPY', label: 'JPY - 日元' }
+            ],
             defaultCurrencyNote: '',
             infoText: '请确保已从YSEPAY方获取以下信息：商户号、子商户、Key 与 AesKey',
             defaultCardTypes: ['全部', 'Maestro', 'Master', 'Visa', 'JCB', 'Diners', 'Discover', 'AE'],
@@ -609,72 +614,157 @@
         ];
         populateMerchantSelects(defaultMerchants);
     };
+    
+    // Expose populateMerchantSelects globally for use in HTML
+    window.populateMerchantSelects = populateMerchantSelects;
 
     function populateMerchantSelects(merchants) {
         console.log('[Channel Binding] ===== populateMerchantSelects CALLED =====');
         console.log('[Channel Binding] Merchants received:', merchants);
         
-        // Try to find the select element - wait a bit if not found
-        let select = document.getElementById('merchant-name');
-        if (!select) {
-            console.warn('[Channel Binding] ⚠ Merchant select element not found immediately, retrying...');
-            console.warn('[Channel Binding] Available select elements:', Array.from(document.querySelectorAll('select')).map(s => ({ id: s.id, name: s.name })));
-            // Retry after a short delay
+        // Populate channel binding merchant select (use querySelector to find select specifically in channel binding tab)
+        const channelBindingTab = document.getElementById('channel-binding-tab');
+        let merchantSelect = null;
+        if (channelBindingTab) {
+            merchantSelect = channelBindingTab.querySelector('select#merchant-name');
+        }
+        if (!merchantSelect) {
+            // Fallback: try direct getElementById (but check it's a select)
+            const directSelect = document.getElementById('merchant-name');
+            if (directSelect && directSelect.tagName === 'SELECT') {
+                merchantSelect = directSelect;
+            }
+        }
+        
+        if (merchantSelect) {
+            console.log('[Channel Binding] Found merchant-name select in channel binding tab');
+            populateSingleMerchantSelect(merchantSelect, merchants, 'merchant-name');
+        } else {
+            console.warn('[Channel Binding] ⚠ merchant-name select element not found in channel binding tab, will retry...');
             setTimeout(() => {
-                select = document.getElementById('merchant-name');
-                if (select) {
-                    console.log('[Channel Binding] Found merchant select on retry');
-                    populateMerchantSelects(merchants);
-                } else {
-                    console.error('[Channel Binding] ✗ Merchant select element still not found after retry!');
-                    console.error('[Channel Binding] Page HTML:', document.body.innerHTML.substring(0, 500));
+                const channelBindingTab = document.getElementById('channel-binding-tab');
+                let retrySelect = null;
+                if (channelBindingTab) {
+                    retrySelect = channelBindingTab.querySelector('select#merchant-name');
                 }
-            }, 100);
+                if (!retrySelect) {
+                    const directSelect = document.getElementById('merchant-name');
+                    if (directSelect && directSelect.tagName === 'SELECT') {
+                        retrySelect = directSelect;
+                    }
+                }
+                if (retrySelect) {
+                    console.log('[Channel Binding] Found merchant-name select on retry');
+                    populateSingleMerchantSelect(retrySelect, merchants, 'merchant-name');
+                } else {
+                    console.warn('[Channel Binding] ⚠ merchant-name select still not found after retry');
+                }
+            }, 300);
+        }
+        
+        // Populate round robin merchant select
+        const rrSelect = document.getElementById('rr-merchant');
+        if (rrSelect) {
+            populateSingleMerchantSelect(rrSelect, merchants, 'rr-merchant');
+        } else {
+            console.warn('[Channel Binding] ⚠ rr-merchant select element not found, will retry...');
+            setTimeout(() => {
+                const retryRrSelect = document.getElementById('rr-merchant');
+                if (retryRrSelect) {
+                    console.log('[Channel Binding] Found rr-merchant on retry');
+                    populateSingleMerchantSelect(retryRrSelect, merchants, 'rr-merchant');
+                } else {
+                    console.warn('[Channel Binding] ⚠ rr-merchant still not found after retry');
+                }
+            }, 300);
+        }
+    }
+    
+    function populateSingleMerchantSelect(select, merchants, selectId) {
+        console.log(`[Channel Binding] Populating ${selectId}...`);
+        console.log(`[Channel Binding] Select element:`, select);
+        console.log(`[Channel Binding] Select element parent:`, select ? select.parentElement : 'null');
+        console.log(`[Channel Binding] Select element visible:`, select ? (select.offsetParent !== null || select.style.display !== 'none') : 'null');
+        
+        // Check if it's actually a select element and has options
+        if (select.tagName !== 'SELECT' && select.nodeName !== 'SELECT') {
+            console.error(`[Channel Binding] Element ${selectId} is not a SELECT element:`, select.tagName);
             return;
         }
         
-        console.log('[Channel Binding] ✓ Found merchant select element');
-        console.log('[Channel Binding] Current options count:', select.options.length);
-        console.log('[Channel Binding] Current options:', Array.from(select.options).map(opt => ({ value: opt.value, text: opt.textContent })));
+        // Access options property - HTMLSelectElement should always have this
+        let options = select.options;
+        if (!options) {
+            // Try alternative access methods
+            options = select.querySelectorAll('option');
+            console.warn(`[Channel Binding] Using querySelectorAll as fallback for ${selectId}`);
+        }
+        
+        const optionsLength = options ? options.length : 0;
+        console.log(`[Channel Binding] Current options count for ${selectId}:`, optionsLength);
         
         // Clear existing options except the first one (placeholder)
-        const initialCount = select.options.length;
-        while (select.options.length > 1) {
-            select.remove(1);
+        const initialCount = options ? options.length : 0;
+        if (select.options) {
+            while (select.options.length > 1) {
+                select.remove(1);
+            }
+        } else if (options && options.length > 1) {
+            // Fallback: remove options using querySelectorAll
+            const optionElements = select.querySelectorAll('option');
+            for (let i = optionElements.length - 1; i > 0; i--) {
+                optionElements[i].remove();
+            }
         }
-        console.log('[Channel Binding] Cleared', initialCount - 1, 'existing options');
+        console.log(`[Channel Binding] Cleared ${initialCount - 1} existing options from ${selectId}`);
         
-        if (!merchants || merchants.length === 0) {
-            console.warn('[Channel Binding] ⚠ No merchants provided to populate, using defaults');
-            merchants = [
+        // Use provided merchants or defaults
+        let merchantsToUse = merchants;
+        if (!merchantsToUse || merchantsToUse.length === 0) {
+            console.warn(`[Channel Binding] ⚠ No merchants provided to populate ${selectId}, using defaults`);
+            merchantsToUse = [
                 { id: 'starsaas', name: 'STARSAAS' },
                 { id: 'nbcpay', name: 'NbcPay' },
                 { id: 'nexpay', name: 'NexPay' }
             ];
         }
         
-        console.log('[Channel Binding] Adding', merchants.length, 'merchant options...');
-        merchants.forEach((merchant, index) => {
+        console.log(`[Channel Binding] Adding ${merchantsToUse.length} merchant options to ${selectId}...`);
+        
+        merchantsToUse.forEach((merchant, index) => {
             const option = document.createElement('option');
             option.value = merchant.id || merchant.value || merchant;
             option.textContent = merchant.name || merchant.text || merchant;
             select.appendChild(option);
-            console.log(`[Channel Binding] [${index + 1}/${merchants.length}] Added:`, option.value, '-', option.textContent);
+            console.log(`[Channel Binding] [${index + 1}/${merchantsToUse.length}] Added to ${selectId}:`, option.value, '-', option.textContent);
         });
         
-        const finalCount = select.options.length;
-        console.log('[Channel Binding] ===== DONE =====');
-        console.log('[Channel Binding] ✓ Merchant select populated with', finalCount - 1, 'options (total:', finalCount, ')');
-        console.log('[Channel Binding] Final merchant options:', Array.from(select.options).map(opt => ({ value: opt.value, text: opt.textContent })));
-        
-        // Verify the options are actually in the DOM
-        const verifySelect = document.getElementById('merchant-name');
-        if (verifySelect && verifySelect.options.length <= 1) {
-            console.error('[Channel Binding] ✗✗✗ VERIFICATION FAILED: Options were not added!');
-            console.error('[Channel Binding] Select element:', verifySelect);
-            console.error('[Channel Binding] Options:', Array.from(verifySelect.options));
+        // Get final count - try options property first, then querySelectorAll
+        let finalCount = 0;
+        if (select.options) {
+            finalCount = select.options.length;
         } else {
-            console.log('[Channel Binding] ✓✓✓ VERIFICATION PASSED: Options are in the DOM');
+            const optionElements = select.querySelectorAll('option');
+            finalCount = optionElements.length;
+        }
+        console.log(`[Channel Binding] ✓ ${selectId} populated with ${finalCount - 1} options (total: ${finalCount})`);
+        
+        // Verify the options are actually visible in the DOM
+        const verifySelect = document.getElementById(selectId);
+        if (verifySelect) {
+            let verifyCount = 0;
+            if (verifySelect.options) {
+                verifyCount = verifySelect.options.length;
+            } else {
+                const verifyOptions = verifySelect.querySelectorAll('option');
+                verifyCount = verifyOptions.length;
+            }
+            console.log(`[Channel Binding] Verification: ${selectId} now has ${verifyCount} options`);
+            if (verifyCount <= 1) {
+                console.error(`[Channel Binding] ✗✗✗ VERIFICATION FAILED for ${selectId}: Options were not added!`);
+            } else {
+                console.log(`[Channel Binding] ✓✓✓ VERIFICATION PASSED for ${selectId}: Options are in the DOM`);
+            }
         }
     }
 
@@ -863,6 +953,18 @@
 
     // Load Card Types Configuration
     async function loadCardTypes(channel) {
+        // Skip API call if running from file:// protocol (CORS will block it)
+        if (window.location.protocol === 'file:') {
+            console.log('[Channel Binding] Running from file:// protocol, using default card types for', channel);
+            // Use default card types from channel config
+            const config = channelConfigs[channel];
+            if (config && config.defaultCardTypes) {
+                cardTypeConfigs[channel] = config.defaultCardTypes;
+                displayCardTypes(channel);
+            }
+            return;
+        }
+        
         try {
             // Try to load from config endpoint first
             const response = await fetch(`/api/channel-binding/admin/config/${channel}`, {
@@ -954,6 +1056,28 @@
 
     // Load Currencies Configuration
     async function loadCurrencies(channel) {
+        // Skip API call if running from file:// protocol (CORS will block it)
+        if (window.location.protocol === 'file:') {
+            console.log('[Channel Binding] Running from file:// protocol, using default currencies for', channel);
+            // Use default currencies from channel config
+            const config = channelConfigs[channel];
+            if (config && config.currencies) {
+                // Expand default currencies for YSEPAY to match image 2
+                if (channel === 'ysepay') {
+                    currencyConfigs[channel] = [
+                        { value: 'USD', label: 'USD - 美元' },
+                        { value: 'HKD', label: 'HKD - 港币' },
+                        { value: 'EUR', label: 'EUR - 欧元' },
+                        { value: 'JPY', label: 'JPY - 日元' }
+                    ];
+                } else {
+                    currencyConfigs[channel] = config.currencies;
+                }
+                displayCurrencies(channel);
+            }
+            return;
+        }
+        
         try {
             // Try to load from config endpoint first
             const response = await fetch(`/api/channel-binding/admin/config/${channel}`, {
@@ -996,6 +1120,16 @@
 
     // Load Interface Type Configuration
     async function loadInterfaceType(channel) {
+        // Skip API call if running from file:// protocol (CORS will block it)
+        if (window.location.protocol === 'file:') {
+            console.log('[Channel Binding] Running from file:// protocol, using default interface type for', channel);
+            // Use default interface type (typically '3-party' for most channels)
+            const defaultInterfaceType = '3-party';
+            interfaceTypeConfigs[channel] = defaultInterfaceType;
+            showDomainBinding(channel, defaultInterfaceType);
+            return;
+        }
+        
         try {
             // Try to load from config endpoint first
             const response = await fetch(`/api/channel-binding/admin/config/${channel}`, {
@@ -1218,6 +1352,28 @@
 
     // Load Channel Hint Configuration
     async function loadChannelHint(channel) {
+        // Always try localStorage first (works even with file:// protocol)
+        try {
+            const stored = localStorage.getItem('channelBindingConfig');
+            if (stored) {
+                const configs = JSON.parse(stored);
+                if (configs[channel]) {
+                    console.log('[Channel Binding] Loaded hint config from localStorage for', channel);
+                    displayChannelHint(channel, configs[channel]);
+                    return;
+                }
+            }
+        } catch (e) {
+            console.warn('LocalStorage fallback failed:', e);
+        }
+        
+        // Skip API call if running from file:// protocol (CORS will block it)
+        if (window.location.protocol === 'file:') {
+            console.log('[Channel Binding] Running from file:// protocol, using default hint for', channel);
+            displayDefaultHint(channel);
+            return;
+        }
+        
         try {
             const response = await fetch(`/api/channel-binding/admin/config/${channel}`, {
                 method: 'GET',
@@ -1229,25 +1385,21 @@
             if (response.ok) {
                 const data = await response.json();
                 displayChannelHint(channel, data);
+                // Also save to localStorage for future use
+                try {
+                    const stored = localStorage.getItem('channelBindingConfig') || '{}';
+                    const configs = JSON.parse(stored);
+                    configs[channel] = data;
+                    localStorage.setItem('channelBindingConfig', JSON.stringify(configs));
+                } catch (e) {
+                    console.warn('Failed to save to localStorage:', e);
+                }
             } else {
                 // Use default hint
                 displayDefaultHint(channel);
             }
         } catch (error) {
             console.warn('Failed to load channel hint:', error);
-            // Try localStorage fallback
-            try {
-                const stored = localStorage.getItem('channelBindingConfig');
-                if (stored) {
-                    const configs = JSON.parse(stored);
-                    if (configs[channel]) {
-                        displayChannelHint(channel, configs[channel]);
-                        return;
-                    }
-                }
-            } catch (e) {
-                console.warn('LocalStorage fallback failed:', e);
-            }
             displayDefaultHint(channel);
         }
     }
@@ -1257,16 +1409,32 @@
         const hintDisplay = document.getElementById('channelHintDisplay');
         const infoBox = document.getElementById('channelInfoBox');
         
-        if (!hintDisplay || !infoBox) return;
-
-        // Hide default info box, show hint display
-        infoBox.style.display = 'none';
-        hintDisplay.style.display = 'block';
+        if (!infoBox) return;
 
         const fileData = config.fileData || config.imageData || config.imageUrl;
         const fileType = config.fileType || (fileData && fileData.includes('data:application/pdf') ? 'pdf' : 'image');
         const fileName = config.fileName || '';
         const textHint = config.textHint || '';
+        
+        // If there's only text hint (no image/PDF), display it in the info box
+        if (!fileData && textHint && textHint.trim()) {
+            infoBox.style.display = 'block';
+            if (hintDisplay) hintDisplay.style.display = 'none';
+            updateInfoBox(textHint);
+            return;
+        }
+        
+        // If there's an image/PDF, show the hint display
+        if (hintDisplay) {
+            // Hide default info box, show hint display
+            infoBox.style.display = 'none';
+            hintDisplay.style.display = 'block';
+        } else if (textHint && textHint.trim()) {
+            // Fallback: if hintDisplay doesn't exist, use info box
+            infoBox.style.display = 'block';
+            updateInfoBox(textHint);
+            return;
+        }
 
         // Thumbnail preview
         const thumbnailContainer = document.getElementById('hintThumbnail');
@@ -2253,10 +2421,62 @@
     // Also try loading merchants when window loads (as a backup)
     window.addEventListener('load', () => {
         console.log('[Channel Binding] Window loaded, ensuring merchants are loaded...');
+        
+        // Check and populate merchant-name
         const select = document.getElementById('merchant-name');
-        if (select && select.options.length <= 1) {
-            console.log('[Channel Binding] Merchant select is empty, loading merchants...');
-            loadMerchantOptions();
+        if (select) {
+            let optionCount = 0;
+            if (select.options) {
+                optionCount = select.options.length;
+            } else {
+                const optionElements = select.querySelectorAll('option');
+                optionCount = optionElements.length;
+            }
+            if (optionCount <= 1) {
+                console.log('[Channel Binding] Merchant select is empty, loading merchants...');
+                loadMerchantOptions();
+            }
+        } else {
+            console.warn('[Channel Binding] merchant-name select not found on window load');
         }
+        
+        // Also check rr-merchant
+        const rrSelect = document.getElementById('rr-merchant');
+        if (rrSelect) {
+            let rrOptionCount = 0;
+            if (rrSelect.options) {
+                rrOptionCount = rrSelect.options.length;
+            } else {
+                const rrOptionElements = rrSelect.querySelectorAll('option');
+                rrOptionCount = rrOptionElements.length;
+            }
+            if (rrOptionCount <= 1) {
+                console.log('[Channel Binding] Round robin merchant select is empty, loading merchants...');
+                const defaultMerchants = [
+                    { id: 'starsaas', name: 'STARSAAS' },
+                    { id: 'nbcpay', name: 'NbcPay' },
+                    { id: 'nexpay', name: 'NexPay' }
+                ];
+                populateMerchantSelects(defaultMerchants);
+            }
+        }
+        
+        // Final fallback: force populate after a delay
+        setTimeout(() => {
+            const select1 = document.getElementById('merchant-name');
+            const select2 = document.getElementById('rr-merchant');
+            const needsPopulate = (select1 && (!select1.options || select1.options.length <= 1)) ||
+                                  (select2 && (!select2.options || select2.options.length <= 1));
+            
+            if (needsPopulate) {
+                console.log('[Channel Binding] Final fallback: Force populating merchants...');
+                const defaultMerchants = [
+                    { id: 'starsaas', name: 'STARSAAS' },
+                    { id: 'nbcpay', name: 'NbcPay' },
+                    { id: 'nexpay', name: 'NexPay' }
+                ];
+                populateMerchantSelects(defaultMerchants);
+            }
+        }, 1000);
     });
 })();

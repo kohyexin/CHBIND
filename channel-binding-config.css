@@ -380,9 +380,17 @@ body {
     margin-bottom: 4px;
 }
 
+.card-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #333;
+}
+
 .card-subtitle {
-    font-size: 12px;
-    opacity: 0.9;
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 24px;
 }
 
 .card-body {
@@ -837,6 +845,56 @@ body {
 .btn-secondary:hover {
     background: #e9e9e9;
     border-color: #ccc;
+}
+
+.btn-sm {
+    padding: 4px 8px;
+    font-size: 12px;
+    min-width: auto;
+    height: auto;
+    line-height: 1.2;
+}
+
+.btn-danger {
+    background: #dc3545;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-danger:hover:not(:disabled) {
+    background: #c82333;
+}
+
+.btn-danger:disabled {
+    background: #dc3545;
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.btn-danger {
+    background: #dc3545;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-danger:hover:not(:disabled) {
+    background: #c82333;
+}
+
+.btn-danger:disabled {
+    background: #dc3545;
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
 /* Message Container */
@@ -1930,7 +1988,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 1000;
+    z-index: 10000;
 }
 
 .modal-content {
@@ -2147,6 +2205,128 @@ body {
     box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.1);
 }
 
+/* Multi-Select Dropdown Styling */
+.multi-select-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.multi-select-display {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    border: 1px solid #4A90E2;
+    border-radius: 4px;
+    background: #fff;
+    cursor: pointer;
+    min-height: 38px;
+    transition: border-color 0.2s;
+}
+
+.multi-select-display:hover {
+    border-color: #357abd;
+}
+
+.multi-select-placeholder {
+    color: #999;
+    font-size: 14px;
+    flex: 1;
+    text-align: left;
+}
+
+.multi-select-arrow {
+    color: #666;
+    font-size: 12px;
+    margin-left: 8px;
+    transition: transform 0.2s;
+    user-select: none;
+}
+
+.multi-select-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin-top: 4px;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    overflow: hidden;
+}
+
+.multi-select-search {
+    padding: 8px;
+    border-bottom: 1px solid #e0e0e0;
+    background: #fff;
+}
+
+.multi-select-search-input {
+    width: 100%;
+    padding: 6px 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    font-size: 14px;
+    outline: none;
+}
+
+.multi-select-search-input:focus {
+    border-color: #4A90E2;
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.1);
+}
+
+.multi-select-options {
+    max-height: 200px;
+    overflow-y: auto;
+    padding: 4px 0;
+}
+
+.multi-select-option {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.multi-select-option:hover {
+    background: #f5f5f5;
+}
+
+.multi-select-option input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin-right: 10px;
+    cursor: pointer;
+    accent-color: #4A90E2;
+    flex-shrink: 0;
+}
+
+.multi-select-option label {
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    flex: 1;
+    user-select: none;
+    margin: 0;
+}
+
+/* Delete Link Styling */
+.delete-link {
+    color: #4A90E2;
+    text-decoration: none;
+    font-size: 14px;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.delete-link:hover {
+    color: #357abd;
+    text-decoration: underline;
+}
+
 .filter-search-btn {
     padding: 8px 24px;
     background: #4A90E2;
@@ -2267,7 +2447,8 @@ body {
     width: 40px;
 }
 
-.summary-table input[type="radio"] {
+.summary-table input[type="radio"],
+.summary-table input[type="checkbox"] {
     cursor: pointer;
 }
 
@@ -2287,6 +2468,20 @@ body {
 .status-badge.status-unbound {
     background: #f8d7da;
     color: #721c24;
+}
+
+.status-badge.status-active {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-badge.status-inactive {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.status-display {
+    margin-top: 8px;
 }
 
 /* Pagination */

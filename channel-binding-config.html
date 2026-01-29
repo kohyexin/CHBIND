@@ -78,7 +78,7 @@
                             <a href="#" class="submenu-link">商户收单配置</a>
                         </li>
                         <li class="submenu-item">
-                            <a href="channel-binding-config.html" class="submenu-link">绑定渠道</a>
+                            <a href="channel-binding-config.html" class="submenu-link">快速配置</a>
                         </li>
                         <li class="submenu-item active">
                             <a href="channel-binding-admin.html" class="submenu-link">绑定渠道配置</a>
@@ -151,7 +151,7 @@
         <!-- Top Header -->
         <header class="top-header">
             <div class="header-left">
-                <span class="breadcrumb-text">商户 > 绑定渠道</span>
+                <span class="breadcrumb-text">商户 > 快速配置</span>
             </div>
             <div class="header-center">
                 <div class="logo">STAR SAAS DEMO</div>
@@ -169,7 +169,10 @@
         <!-- Tabs Navigation -->
         <div class="tabs-container">
             <div class="tabs">
-                <button class="tab-button active" data-tab="channel-binding" onclick="switchTab('channel-binding')">
+                <button class="tab-button active" data-tab="merchant-config" onclick="switchTab('merchant-config')">
+                    商户配置
+                </button>
+                <button class="tab-button" data-tab="channel-binding" onclick="switchTab('channel-binding')">
                     渠道绑定
                 </button>
                 <button class="tab-button" data-tab="platform-config" onclick="switchTab('platform-config')">
@@ -187,8 +190,430 @@
             </div>
         </div>
 
-        <!-- Tab 1: Channel Binding -->
-        <div class="tab-content active" id="channel-binding-tab">
+        <!-- Tab 1: Merchant Configuration -->
+        <div class="tab-content active" id="merchant-config-tab">
+            <!-- Summary Section: List of Merchants -->
+            <div class="summary-section" id="merchantSummarySection">
+                <!-- Filter Controls -->
+                <div class="filter-container">
+                    <div class="filter-controls">
+                        <div class="filter-group">
+                            <label for="filter-industry">所属行业:</label>
+                            <select id="filter-industry" class="filter-select">
+                                <option value="">请选择</option>
+                                <option value="retail">零售</option>
+                                <option value="ecommerce">电商</option>
+                                <option value="service">服务</option>
+                                <option value="other">其他</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="filter-region">所属区域:</label>
+                            <select id="filter-region" class="filter-select">
+                                <option value="">请选择</option>
+                                <option value="asia">亚洲</option>
+                                <option value="europe">欧洲</option>
+                                <option value="america">美洲</option>
+                                <option value="other">其他</option>
+                            </select>
+                        </div>
+                        <button class="filter-search-btn" onclick="applyMerchantFilters()">查询</button>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons-container">
+                    <button class="action-btn" onclick="clearMerchantFilters()">
+                        <span class="action-icon">🗑️</span>
+                        <span>清除过滤</span>
+                    </button>
+                    <button class="action-btn" onclick="activateSelectedMerchant()" id="merchant-activate-btn-action" disabled>
+                        <span class="action-icon">✅</span>
+                        <span>激活</span>
+                    </button>
+                    <button class="action-btn bind-btn" onclick="showMerchantConfigForm()">
+                        <span class="action-icon">➕</span>
+                        <span>注册新商户</span>
+                    </button>
+                    <button class="action-btn modify-btn" onclick="modifySelectedMerchant()" id="merchant-modify-btn" disabled>
+                        <span class="action-icon">✏️</span>
+                        <span>修改</span>
+                    </button>
+                    <button class="action-btn unbind-btn" onclick="deactivateSelectedMerchant()" id="merchant-deactivate-btn" disabled>
+                        <span class="action-icon">⏸️</span>
+                        <span>停用</span>
+                    </button>
+                    <button class="action-btn" onclick="restoreSelectedMerchant()" id="merchant-restore-btn" disabled>
+                        <span class="action-icon">🔄</span>
+                        <span>恢复</span>
+                    </button>
+                    <button class="action-btn" onclick="viewMerchantDetails()" id="merchant-details-btn" disabled>
+                        <span class="action-icon">👁️</span>
+                        <span>详情</span>
+                    </button>
+                    <button class="action-btn copy-btn" onclick="copySelectedMerchant()" id="merchant-copy-btn" disabled>
+                        <span class="action-icon">📋</span>
+                        <span>复制</span>
+                    </button>
+                </div>
+
+                <!-- Merchant List Table -->
+                <div class="table-container">
+                    <table class="summary-table" id="merchantTable">
+                        <thead>
+                            <tr>
+                                <th width="40">
+                                    <input type="checkbox" id="select-all-merchants" onclick="toggleSelectAllMerchants()">
+                                </th>
+                                <th>公司名 <span class="sort-icon">▼</span></th>
+                                <th>商户号 <span class="sort-icon">▼</span></th>
+                                <th>商户名称 <span class="sort-icon">▼</span></th>
+                                <th>信用等级 <span class="sort-icon">▼</span></th>
+                                <th>销售人员 <span class="sort-icon">▼</span></th>
+                                <th>商户接入风险级别 <span class="sort-icon">▼</span></th>
+                                <th>注册日期 <span class="sort-icon">▼</span></th>
+                                <th>合同起始日期 <span class="sort-icon">▼</span></th>
+                                <th>合同结束日期 <span class="sort-icon">▼</span></th>
+                                <th>状态 <span class="sort-icon">▼</span></th>
+                            </tr>
+                        </thead>
+                        <tbody id="merchantTableBody">
+                            <!-- Data will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination-container">
+                    <div class="pagination-info">
+                        <span id="merchantPaginationRange">1~5</span>
+                    </div>
+                    <div class="pagination-controls">
+                        <button class="pagination-btn" id="merchantPrevPageBtn" onclick="changeMerchantPage(-1)" disabled>← 上一页</button>
+                        <button class="pagination-btn" id="merchantNextPageBtn" onclick="changeMerchantPage(1)">下一页 →</button>
+                        <select class="pagination-select" id="merchantPageSizeSelect" onchange="changeMerchantPageSize()">
+                            <option value="10" selected>10</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Configuration Form Card (Hidden by default) -->
+            <div class="config-card" id="merchantConfigFormCard" style="display: none;">
+                <div class="card-body">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <div>
+                            <h2 class="card-title">快速商户配置</h2>
+                            <p class="card-subtitle">配置新商户账号，仅需填写必要字段</p>
+                        </div>
+                        <button class="btn btn-secondary" onclick="hideMerchantConfigForm()" style="margin-top: 0;">返回列表</button>
+                    </div>
+                    
+                    <form id="merchantConfigForm" class="config-form" onsubmit="return false;">
+                        <!-- Top Fields Section -->
+                        <div class="form-section">
+                            <h3 class="section-title">商户基本信息</h3>
+                            <div class="form-grid">
+                                <div class="form-group full-width">
+                                    <label for="merchant-company-name">公司名 <span class="required">*</span></label>
+                                    <input type="text" id="merchant-company-name" name="companyName" required 
+                                           placeholder="请输入公司名" class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="merchant-company-full-name-en">商户公司全称 (英文) <span class="required">*</span></label>
+                                    <input type="text" id="merchant-company-full-name-en" name="companyFullNameEn" required 
+                                           placeholder="请输入商户公司全称（英文）" class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="merchant-company-short-name-en">商户公司简称 (英文) <span class="required">*</span></label>
+                                    <input type="text" id="merchant-company-short-name-en" name="companyShortNameEn" required 
+                                           placeholder="请输入商户公司简称（英文）" class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="merchant-company-name">商户名称 <span class="required">*</span></label>
+                                    <input type="text" id="merchant-company-name" name="merchantName" required 
+                                           placeholder="请输入商户名称" class="form-input">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 商户超级管理员信息 -->
+                        <div class="form-section">
+                            <h3 class="section-title">商户超级管理员信息</h3>
+                            <div class="info-box" style="margin-bottom: 20px;">
+                                <p>此角色将被授予最高权限，可访问此账号下的所有菜单。</p>
+                            </div>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="merchant-login-account">登陆账号 <span class="required">*</span></label>
+                                    <input type="text" id="merchant-login-account" name="loginAccount" required 
+                                           placeholder="请输入登陆账号" class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="merchant-login-user-name">登录用户名称 <span class="required">*</span></label>
+                                    <input type="text" id="merchant-login-user-name" name="loginUserName" required 
+                                           placeholder="请输入登录用户名称" class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="merchant-login-password">登陆密码 <span class="required">*</span></label>
+                                    <input type="password" id="merchant-login-password" name="loginPassword" required 
+                                           placeholder="请输入登陆密码" class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="merchant-confirm-password">确认密码 <span class="required">*</span></label>
+                                    <input type="password" id="merchant-confirm-password" name="confirmPassword" required 
+                                           placeholder="请再次输入密码" class="form-input">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 网关接入号设置 -->
+                        <div class="form-section">
+                            <h3 class="section-title">网关接入号设置</h3>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="merchant-sub-account-name">子账户名称 <span class="required">*</span></label>
+                                    <input type="text" id="merchant-sub-account-name" name="subAccountName" required 
+                                           placeholder="请输入子账户名称" class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="merchant-description">描述</label>
+                                    <input type="text" id="merchant-description" name="description" 
+                                           placeholder="请输入描述" class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="merchant-settlement-currency">结算币种 <span class="required">*</span></label>
+                                    <select id="merchant-settlement-currency" name="settlementCurrency" required class="form-select">
+                                        <option value="">请选择</option>
+                                        <option value="USD" selected>USD - 美元</option>
+                                        <option value="EUR">EUR - 欧元</option>
+                                        <option value="GBP">GBP - 英镑</option>
+                                        <option value="CNY">CNY - 人民币</option>
+                                        <option value="JPY">JPY - 日元</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="merchant-key-value">KEY 值 <span class="required">*</span></label>
+                                    <input type="text" id="merchant-key-value" name="keyValue" required 
+                                           placeholder="请输入 KEY 值" class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="merchant-binding-interface-type">绑定接口类型 <span class="required">*</span></label>
+                                    <select id="merchant-binding-interface-type" name="bindingInterfaceType" required class="form-select">
+                                        <option value="">请选择</option>
+                                        <option value="3-party" selected>3方</option>
+                                        <option value="2-party">2方</option>
+                                    </select>
+                                    <small class="form-hint">3方=跳转，2方=直连</small>
+                                </div>
+                            </div>
+                            
+                            <!-- Default Settings Remark -->
+                            <div class="default-settings-remark" style="margin-top: 24px; padding: 16px; background: #f5f5f5; border-radius: 8px;">
+                                <div style="display: flex; align-items: flex-start; margin-bottom: 16px;">
+                                    <div style="width: 20px; height: 20px; border-radius: 50%; background: #4A90E2; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-right: 8px;">
+                                        <span style="color: white; font-size: 12px; font-weight: bold;">i</span>
+                                    </div>
+                                    <p style="margin: 0; font-size: 13px; color: #333; line-height: 1.5;">
+                                        备注：以下信息为系统默认设置。如需修改，请在完成快速配置后前往「商户维护」进行调整。
+                                    </p>
+                                </div>
+                                <div class="default-settings-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px 32px; font-size: 13px; color: #333;">
+                                    <!-- Left Column -->
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <span>是否开启 3D</span>
+                                        <span style="color: #4A90E2; font-weight: 500;">是</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <span>是否开启 3D 2.0</span>
+                                        <span style="color: #4A90E2; font-weight: 500;">是</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <span>是否开启本地 Token</span>
+                                        <span style="color: #4A90E2; font-weight: 500;">是</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <span>是否分数商户订单号到渠道</span>
+                                        <span style="color: #666;">否</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <span>是否发送账单地址给渠道</span>
+                                        <span style="color: #4A90E2; font-weight: 500;">是</span>
+                                    </div>
+                                    <!-- Right Column -->
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <span>是否取消自动扣款</span>
+                                        <span style="color: #666;">否</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <span>自动做capture的时间</span>
+                                        <span style="color: #4A90E2; font-weight: 500;">0.5 小时</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <span>使用平台交易订单号</span>
+                                        <span style="color: #4A90E2; font-weight: 500;">是</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <span>发送账单描述</span>
+                                        <span style="color: #4A90E2; font-weight: 500;">是</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <span>发送产品信息</span>
+                                        <span style="color: #4A90E2; font-weight: 500;">直接发送</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 网关接入号通道绑定 -->
+                        <div class="form-section">
+                            <h3 class="section-title">网关接入号通道绑定</h3>
+                            <div class="info-box" style="margin-bottom: 20px;">
+                                <p><strong>提示：</strong>配置支付方式及对应卡种。如果有多家渠道的话只需要配置其中一家对应的卡种即可。</p>
+                            </div>
+                            <div class="form-grid">
+                                <div class="form-group full-width">
+                                    <label for="merchant-payment-method">支付方式 <span class="required">*</span></label>
+                                    <select id="merchant-payment-method" name="paymentMethod" required class="form-select" onchange="handlePaymentMethodChange()">
+                                        <option value="">请选择支付方式</option>
+                                        <option value="credit_card">信用卡</option>
+                                        <option value="mix">混合支付</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" id="card-types-group" style="display: none;">
+                                    <label for="merchant-card-types">卡种 <span class="required">*</span></label>
+                                    <div class="multi-select-wrapper">
+                                        <div class="multi-select-display" onclick="toggleMultiSelect('card-types')">
+                                            <span class="multi-select-placeholder" id="card-types-placeholder">请选择卡种</span>
+                                            <span class="multi-select-arrow" id="card-types-arrow">▼</span>
+                                        </div>
+                                        <div class="multi-select-dropdown" id="card-types-dropdown" style="display: none;">
+                                            <div class="multi-select-search">
+                                                <input type="text" id="card-types-search" class="multi-select-search-input" 
+                                                       placeholder="搜索..." onkeyup="filterMultiSelect('card-types', this.value)"
+                                                       onclick="event.stopPropagation()">
+                                            </div>
+                                            <div class="multi-select-options" id="card-types-options">
+                                                <div class="multi-select-option">
+                                                    <input type="checkbox" id="card-visa" value="VISA" onchange="updateMultiSelect('card-types')">
+                                                    <label for="card-visa">VISA</label>
+                                                </div>
+                                                <div class="multi-select-option">
+                                                    <input type="checkbox" id="card-mastercard" value="MasterCard" onchange="updateMultiSelect('card-types')">
+                                                    <label for="card-mastercard">MasterCard</label>
+                                                </div>
+                                                <div class="multi-select-option">
+                                                    <input type="checkbox" id="card-jcb" value="JCB" onchange="updateMultiSelect('card-types')">
+                                                    <label for="card-jcb">JCB</label>
+                                                </div>
+                                                <div class="multi-select-option">
+                                                    <input type="checkbox" id="card-cup" value="CUP" onchange="updateMultiSelect('card-types')">
+                                                    <label for="card-cup">CUP</label>
+                                                </div>
+                                                <div class="multi-select-option">
+                                                    <input type="checkbox" id="card-diners" value="Diners" onchange="updateMultiSelect('card-types')">
+                                                    <label for="card-diners">Diners</label>
+                                                </div>
+                                                <div class="multi-select-option">
+                                                    <input type="checkbox" id="card-discover" value="Discover" onchange="updateMultiSelect('card-types')">
+                                                    <label for="card-discover">Discover</label>
+                                                </div>
+                                                <div class="multi-select-option">
+                                                    <input type="checkbox" id="card-amex" value="AMEX" onchange="updateMultiSelect('card-types')">
+                                                    <label for="card-amex">AMEX</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <input type="hidden" id="merchant-card-types" name="cardTypes" required>
+                                    </div>
+                                </div>
+                                <div class="form-group" id="channels-group" style="display: none;">
+                                    <label for="merchant-channels">渠道 <span class="required">*</span></label>
+                                    <div class="multi-select-wrapper">
+                                        <div class="multi-select-display" onclick="toggleMultiSelect('channels')">
+                                            <span class="multi-select-placeholder" id="channels-placeholder">请选择渠道</span>
+                                            <span class="multi-select-arrow" id="channels-arrow">▼</span>
+                                        </div>
+                                        <div class="multi-select-dropdown" id="channels-dropdown" style="display: none;">
+                                            <div class="multi-select-search">
+                                                <input type="text" id="channels-search" class="multi-select-search-input" 
+                                                       placeholder="搜索..." onkeyup="filterMultiSelect('channels', this.value)"
+                                                       onclick="event.stopPropagation()">
+                                            </div>
+                                            <div class="multi-select-options" id="channels-options">
+                                                <div class="multi-select-option">
+                                                    <input type="checkbox" id="channel-ysepay" value="ysepay" onchange="updateMultiSelect('channels')">
+                                                    <label for="channel-ysepay">YSEPAY</label>
+                                                </div>
+                                                <div class="multi-select-option">
+                                                    <input type="checkbox" id="channel-rumble" value="rumble" onchange="updateMultiSelect('channels')">
+                                                    <label for="channel-rumble">RUMBLE</label>
+                                                </div>
+                                                <div class="multi-select-option">
+                                                    <input type="checkbox" id="channel-evonet" value="evonet" onchange="updateMultiSelect('channels')">
+                                                    <label for="channel-evonet">EVONET</label>
+                                                </div>
+                                                <div class="multi-select-option">
+                                                    <input type="checkbox" id="channel-paysaas" value="paysaas" onchange="updateMultiSelect('channels')">
+                                                    <label for="channel-paysaas">PAYSAAS</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <input type="hidden" id="merchant-channels" name="channels" required>
+                                    </div>
+                                </div>
+                                <div class="form-group full-width" id="build-button-group" style="display: none; margin-top: 8px;">
+                                    <button type="button" class="btn btn-primary" onclick="buildChannelBinding()" id="build-channel-binding-btn">
+                                        构建通道绑定
+                                    </button>
+                                </div>
+                                <div class="form-group full-width" id="channel-binding-results" style="display: none; margin-top: 20px;">
+                                    <div style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 12px;">
+                                        <button type="button" class="btn btn-danger" onclick="deleteSelectedChannelBindings()" id="delete-selected-results-btn" style="display: none;">
+                                            删除选中项 (<span id="selected-count">0</span>)
+                                        </button>
+                                    </div>
+                                    <div class="table-container">
+                                        <table class="summary-table" id="channelBindingResultsTable">
+                                            <thead>
+                                                <tr>
+                                                    <th width="40">
+                                                        <input type="checkbox" id="select-all-results" onclick="toggleSelectAllResults()">
+                                                    </th>
+                                                    <th>序号</th>
+                                                    <th>Payment method</th>
+                                                    <th>Card type</th>
+                                                    <th>Acquirer</th>
+                                                    <th>Channel</th>
+                                                    <th>bound status</th>
+                                                    <th>Remarks</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="channelBindingResultsBody">
+                                                <!-- Results will be populated here -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" onclick="resetMerchantForm()">重置</button>
+                            <button type="button" class="btn btn-primary" id="merchant-submit-btn" onclick="handleMerchantFormSubmit(event)">提交</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 2: Channel Binding -->
+        <div class="tab-content" id="channel-binding-tab">
         
         <!-- Summary Section: List of Configured Channels -->
         <div class="summary-section" id="summarySection">
@@ -1488,9 +1913,106 @@
             if (selectedButton) {
                 selectedButton.classList.add('active');
             }
+            
+            // Load data when switching to specific tabs
+            if (tabName === 'platform-config') {
+                // Ensure platform merchant options are loaded when switching to platform config tab
+                setTimeout(() => {
+                    loadPlatformMerchantOptions();
+                }, 100);
+            }
 
             if (tabName === 'round-robin') {
                 loadRoundRobinList();
+                // Ensure merchants are loaded for round robin tab
+                setTimeout(() => {
+                    // First try to use the global populate function
+                    const defaultMerchants = [
+                        { id: 'starsaas', name: 'STARSAAS' },
+                        { id: 'nbcpay', name: 'NbcPay' },
+                        { id: 'nexpay', name: 'NexPay' }
+                    ];
+                    if (typeof window.populateMerchantSelects === 'function') {
+                        window.populateMerchantSelects(defaultMerchants);
+                    }
+                    // Also call the round robin specific function
+                    if (typeof loadMerchantsForRoundRobin === 'function') {
+                        loadMerchantsForRoundRobin();
+                    }
+                }, 100);
+            }
+            
+            if (tabName === 'channel-binding') {
+                // Ensure merchants are loaded when switching to channel binding tab
+                setTimeout(() => {
+                    // Find the select element specifically in the channel binding tab
+                    const channelBindingTab = document.getElementById('channel-binding-tab');
+                    let merchantSelect = null;
+                    if (channelBindingTab) {
+                        merchantSelect = channelBindingTab.querySelector('select#merchant-name');
+                    }
+                    // Fallback: try direct getElementById but verify it's a select
+                    if (!merchantSelect) {
+                        const directSelect = document.getElementById('merchant-name');
+                        if (directSelect && directSelect.tagName === 'SELECT') {
+                            merchantSelect = directSelect;
+                        }
+                    }
+                    
+                    if (merchantSelect) {
+                        // Check if it's empty
+                        let optionCount = 0;
+                        if (merchantSelect.options) {
+                            optionCount = merchantSelect.options.length;
+                        } else {
+                            const optionElements = merchantSelect.querySelectorAll('option');
+                            optionCount = optionElements.length;
+                        }
+                        
+                        if (optionCount <= 1) {
+                            console.log('[Channel Binding Tab] Merchant select is empty, populating...');
+                            // Directly populate the merchant dropdown
+                            const defaultMerchants = [
+                                { id: 'starsaas', name: 'STARSAAS' },
+                                { id: 'nbcpay', name: 'NbcPay' },
+                                { id: 'nexpay', name: 'NexPay' }
+                            ];
+                            
+                            // Clear existing options except placeholder
+                            if (merchantSelect.options) {
+                                while (merchantSelect.options.length > 1) {
+                                    merchantSelect.remove(1);
+                                }
+                            }
+                            
+                            // Add merchant options
+                            defaultMerchants.forEach(merchant => {
+                                const option = document.createElement('option');
+                                option.value = merchant.id;
+                                option.textContent = merchant.name;
+                                merchantSelect.appendChild(option);
+                            });
+                            
+                            console.log('[Channel Binding Tab] Directly populated merchant select with', defaultMerchants.length, 'options');
+                        }
+                    } else {
+                        console.warn('[Channel Binding Tab] Could not find merchant-name select element');
+                    }
+                    
+                    // Also try the global function
+                    const defaultMerchants = [
+                        { id: 'starsaas', name: 'STARSAAS' },
+                        { id: 'nbcpay', name: 'NbcPay' },
+                        { id: 'nexpay', name: 'NexPay' }
+                    ];
+                    if (typeof window.populateMerchantSelects === 'function') {
+                        window.populateMerchantSelects(defaultMerchants);
+                    } else if (typeof window.reloadMerchants === 'function') {
+                        window.reloadMerchants();
+                    } else if (typeof loadMerchantOptions === 'function') {
+                        loadMerchantOptions();
+                    }
+                }, 150);
             }
             
             if (tabName === 'charts') {
@@ -1522,7 +2044,1291 @@
                 }
                 loadAnalysisData();
             }
+
+            if (tabName === 'merchant-config') {
+                // Initialize merchant config form handlers
+                initMerchantConfigForm();
+                // Load merchant list
+                loadMerchantList();
+            }
         };
+
+        // Handle Payment Method Change
+        function handlePaymentMethodChange() {
+            const paymentMethod = document.getElementById('merchant-payment-method').value;
+            const cardTypesGroup = document.getElementById('card-types-group');
+            const channelsGroup = document.getElementById('channels-group');
+            
+            if (paymentMethod) {
+                cardTypesGroup.style.display = 'block';
+                channelsGroup.style.display = 'block';
+            } else {
+                cardTypesGroup.style.display = 'none';
+                channelsGroup.style.display = 'none';
+                document.getElementById('build-button-group').style.display = 'none';
+                document.getElementById('channel-binding-results').style.display = 'none';
+                // Clear selections when hidden
+                const cardTypesCheckboxes = document.querySelectorAll('#card-types-dropdown input[type="checkbox"]');
+                const channelsCheckboxes = document.querySelectorAll('#channels-dropdown input[type="checkbox"]');
+                cardTypesCheckboxes.forEach(cb => cb.checked = false);
+                channelsCheckboxes.forEach(cb => cb.checked = false);
+                document.getElementById('merchant-card-types').value = '';
+                document.getElementById('merchant-channels').value = '';
+                document.getElementById('card-types-placeholder').textContent = '请选择卡种';
+                document.getElementById('card-types-placeholder').style.color = '#999';
+                document.getElementById('channels-placeholder').textContent = '请选择渠道';
+                document.getElementById('channels-placeholder').style.color = '#999';
+            }
+        }
+
+        // Merchant Configuration Form Handlers
+        function initMerchantConfigForm() {
+            // Initialize payment method change handler
+            const paymentMethodSelect = document.getElementById('merchant-payment-method');
+            if (paymentMethodSelect) {
+                paymentMethodSelect.addEventListener('change', handlePaymentMethodChange);
+            }
+
+            // Password confirmation validation
+            const passwordInput = document.getElementById('merchant-login-password');
+            const confirmPasswordInput = document.getElementById('merchant-confirm-password');
+            
+            if (confirmPasswordInput) {
+                confirmPasswordInput.addEventListener('blur', function() {
+                    const password = passwordInput ? passwordInput.value : '';
+                    const confirmPassword = this.value;
+                    if (confirmPassword && password !== confirmPassword) {
+                        this.setCustomValidity('密码和确认密码不匹配');
+                    } else {
+                        this.setCustomValidity('');
+                    }
+                });
+            }
+            
+            if (passwordInput) {
+                passwordInput.addEventListener('input', function() {
+                    const confirmPassword = confirmPasswordInput ? confirmPasswordInput.value : '';
+                    if (confirmPassword && this.value !== confirmPassword) {
+                        if (confirmPasswordInput) {
+                            confirmPasswordInput.setCustomValidity('密码和确认密码不匹配');
+                        }
+                    } else {
+                        if (confirmPasswordInput) {
+                            confirmPasswordInput.setCustomValidity('');
+                        }
+                    }
+                });
+            }
+
+            // No checkbox logic needed - using multiple select dropdowns now
+
+            const form = document.getElementById('merchantConfigForm');
+            if (form) {
+                // Remove any existing listeners to avoid duplicates
+                form.removeEventListener('submit', handleMerchantFormSubmit);
+                // Add submit listener as backup (though button click is primary)
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleMerchantFormSubmit(e);
+                    return false;
+                });
+                console.log('[Merchant Config] Form submit listener attached');
+            }
+            
+            // Also attach click handler to submit button directly
+            const submitBtn = document.getElementById('merchant-submit-btn');
+            if (submitBtn) {
+                submitBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleMerchantFormSubmit(e);
+                    return false;
+                });
+                console.log('[Merchant Config] Submit button click listener attached');
+            }
+        }
+
+        // Handle Merchant Form Submission
+        async function handleMerchantFormSubmit(e) {
+            // Prevent default form submission
+            if (e && e.preventDefault) {
+                e.preventDefault();
+            }
+            if (e && e.stopPropagation) {
+                e.stopPropagation();
+            }
+            
+            console.log('[Merchant Config] ===== handleMerchantFormSubmit CALLED =====');
+            console.log('[Merchant Config] Event:', e);
+            
+            const form = document.getElementById('merchantConfigForm');
+            if (!form) return;
+
+            // Validate form
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            // Validate multi-select fields
+            const cardTypesValue = document.getElementById('merchant-card-types').value;
+            const channelsValue = document.getElementById('merchant-channels').value;
+            const paymentMethod = document.getElementById('merchant-payment-method').value;
+            
+            if (paymentMethod) {
+                if (!cardTypesValue || JSON.parse(cardTypesValue || '[]').length === 0) {
+                    showMerchantMessage('请至少选择一个卡种', 'error');
+                    return;
+                }
+                if (!channelsValue || JSON.parse(channelsValue || '[]').length === 0) {
+                    showMerchantMessage('请至少选择一个渠道', 'error');
+                    return;
+                }
+            }
+
+            // Validate password confirmation
+            const password = document.getElementById('merchant-login-password').value;
+            const confirmPassword = document.getElementById('merchant-confirm-password').value;
+            if (password !== confirmPassword) {
+                showMerchantMessage('密码和确认密码不匹配', 'error');
+                return;
+            }
+
+            // Collect form data
+            const formData = {
+                companyName: document.getElementById('merchant-company-name').value,
+                companyFullNameEn: document.getElementById('merchant-company-full-name-en').value,
+                companyShortNameEn: document.getElementById('merchant-company-short-name-en').value,
+                merchantName: document.getElementById('merchant-company-name')?.value || document.querySelector('#channel-binding-tab select#merchant-name')?.value || '',
+                loginAccount: document.getElementById('merchant-login-account').value,
+                loginUserName: document.getElementById('merchant-login-user-name').value,
+                loginPassword: document.getElementById('merchant-login-password').value,
+                subAccountName: document.getElementById('merchant-sub-account-name').value,
+                description: document.getElementById('merchant-description').value,
+                settlementCurrency: document.getElementById('merchant-settlement-currency').value,
+                keyValue: document.getElementById('merchant-key-value').value,
+                bindingInterfaceType: document.getElementById('merchant-binding-interface-type').value,
+                paymentMethod: document.getElementById('merchant-payment-method').value,
+                cardTypes: JSON.parse(document.getElementById('merchant-card-types').value || '[]'),
+                channels: JSON.parse(document.getElementById('merchant-channels').value || '[]')
+            };
+
+            // Show loading
+            const submitBtn = document.getElementById('merchant-submit-btn');
+            const originalText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = '提交中...';
+
+            // Check if running from file:// protocol - skip API call and show popup directly
+            if (window.location.protocol === 'file:') {
+                console.log('[Merchant Config] Running from file:// protocol, showing popup directly');
+                // Simulate a small delay to show loading state
+                await new Promise(resolve => setTimeout(resolve, 500));
+                showMerchantConfigSuccessPopup(formData, { success: true });
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+                return;
+            }
+
+            try {
+                // Submit to backend API
+                console.log('[Merchant Config] Submitting form data:', formData);
+                const response = await fetch('/api/merchant/configure', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                console.log('[Merchant Config] Response status:', response.status);
+
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('[Merchant Config] Success response:', result);
+                    // Show success popup with information to copy
+                    // Don't hide form yet - let user close popup first
+                    showMerchantConfigSuccessPopup(formData, result);
+                } else {
+                    const error = await response.json();
+                    console.error('[Merchant Config] Error response:', error);
+                    showMerchantMessage(error.message || '提交失败，请重试', 'error');
+                }
+            } catch (error) {
+                console.error('[Merchant Config] Submission error:', error);
+                console.error('[Merchant Config] Error type:', error.constructor.name);
+                console.error('[Merchant Config] Error message:', error.message);
+                // For network errors (CORS, fetch failures), still show popup with the data
+                // This handles cases where API is not available
+                if (error.name === 'TypeError' || error.message.includes('fetch') || error.message.includes('Failed to fetch') || error.message.includes('CORS')) {
+                    console.log('[Merchant Config] Network error detected, showing popup with form data');
+                    showMerchantConfigSuccessPopup(formData, { success: true });
+                } else {
+                    showMerchantMessage('网络错误，请重试', 'error');
+                }
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+            }
+        }
+
+        // Show Merchant Config Success Popup
+        function showMerchantConfigSuccessPopup(formData, result) {
+            console.log('[Merchant Config] ===== showMerchantConfigSuccessPopup CALLED =====');
+            console.log('[Merchant Config] Form data:', formData);
+            console.log('[Merchant Config] Result:', result);
+            
+            // IMPORTANT: Do NOT hide the form here - keep it visible behind the popup
+            // The form will only be hidden when the user closes the popup
+            
+            // Create or get modal
+            let modal = document.getElementById('merchantConfigSuccessModal');
+            if (!modal) {
+                console.log('[Merchant Config] Creating new modal element');
+                modal = document.createElement('div');
+                modal.id = 'merchantConfigSuccessModal';
+                modal.className = 'modal';
+                modal.style.display = 'none';
+                modal.style.zIndex = '10000'; // Ensure it's above everything
+                modal.style.position = 'fixed';
+                modal.style.top = '0';
+                modal.style.left = '0';
+                modal.style.right = '0';
+                modal.style.bottom = '0';
+                // Close on background click
+                modal.addEventListener('click', function(e) {
+                    if (e.target === modal) {
+                        console.log('[Merchant Config] Modal background clicked, closing');
+                        closeMerchantConfigSuccessModal();
+                    }
+                });
+                document.body.appendChild(modal);
+                console.log('[Merchant Config] Modal appended to body');
+            } else {
+                console.log('[Merchant Config] Using existing modal element');
+            }
+            
+            // Build information text to display
+            const paymentMethodText = formData.paymentMethod === 'credit_card' ? '信用卡' : formData.paymentMethod === 'mix' ? '混合支付' : '无';
+            const interfaceTypeText = formData.bindingInterfaceType === '3-party' ? '3方 (跳转)' : formData.bindingInterfaceType === '2-party' ? '2方 (直连)' : '无';
+            const cardTypesText = formData.cardTypes && formData.cardTypes.length > 0 ? formData.cardTypes.join(', ') : '无';
+            const channelsText = formData.channels && formData.channels.length > 0 ? formData.channels.join(', ') : '无';
+            
+            // System generated values (mock for now)
+            const mid = '1040971';
+            const subaccount = '1040971001';
+            
+            // Escape HTML helper function
+            const escapeHtml = (str) => (str || '').toString().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+            
+            // Escape values for safe display
+            const escapedMid = escapeHtml(mid);
+            const escapedSubaccount = escapeHtml(subaccount);
+            const escapedKey = escapeHtml(formData.keyValue);
+            
+            // Full info text for "复制信息" button (excludes 配置时间 as it's a system log)
+            const fullInfoText = `商户配置信息
+
+MID: ${mid}
+商户名称: ${formData.merchantName || formData.companyName}
+子账户: ${subaccount}
+子账户名称: ${formData.subAccountName}
+KEY 值: ${formData.keyValue}
+绑定接口类型: ${interfaceTypeText}`;
+            
+            // Store individual values for easy copying
+            if (!window.merchantConfigInfoText) {
+                window.merchantConfigInfoText = {};
+            }
+            window.merchantConfigInfoText.mid = mid;
+            window.merchantConfigInfoText.subaccount = subaccount;
+            window.merchantConfigInfoText.key = formData.keyValue;
+            window.merchantConfigInfoText.original = fullInfoText;
+            
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width: 600px;" onclick="event.stopPropagation()">
+                    <div class="modal-header" style="border-bottom: none; padding-bottom: 0;">
+                        <button class="modal-close" onclick="closeMerchantConfigSuccessModal()" style="position: absolute; top: 16px; right: 16px;">&times;</button>
+                    </div>
+                    <div class="modal-body" style="padding: 20px;">
+                        <div style="margin-bottom: 24px; text-align: center;">
+                            <div style="width: 64px; height: 64px; background: #e8f5e9; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
+                                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" fill="#4caf50" stroke="#4caf50" stroke-width="1.5"/>
+                                </svg>
+                            </div>
+                            <h3 style="color: #333; font-size: 18px; font-weight: 600; margin: 0 0 8px 0;">商户创建并激活成功</h3>
+                            <p style="color: #999; font-size: 14px; margin: 0 0 16px 0;">您的商户账号已成功创建并激活</p>
+                            <div style="background: #e0f2fe; border-left: 4px solid #3b82f6; border-radius: 4px; padding: 12px 16px; display: flex; align-items: center; gap: 8px; margin: 0 auto; max-width: 500px;">
+                                <span style="color: #2563eb; font-size: 16px; font-weight: 600; font-style: italic; font-family: serif;">i</span>
+                                <span style="color: #2563eb; font-size: 13px;">此 API key 仍可在「商户维护」菜单中查看。</span>
+                            </div>
+                        </div>
+                        <div style="background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 4px; padding: 16px; margin-bottom: 16px; max-height: 500px; overflow-y: auto;">
+                            <!-- Single-column layout -->
+                            <div style="display: flex; flex-direction: column; gap: 3px;">
+                                <div style="padding: 2px 0;">
+                                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <span style="font-size: 13px; color: #666;">MID:</span>
+                                            <span style="font-size: 13px; color: #333; font-family: monospace;">${escapedMid}</span>
+                                        </div>
+                                        <button class="copy-btn-icon" onclick="copyMerchantField('mid', event)" style="background: none; border: none; cursor: pointer; padding: 4px; display: flex; align-items: center; justify-content: center; border-radius: 3px; transition: background 0.2s; margin-left: 8px;" onmouseover="this.style.background='#f0f0f0'" onmouseout="this.style.background='none'">
+                                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <rect x="5" y="5" width="9" height="9" stroke="#666" stroke-width="1.2" fill="none" rx="1"/>
+                                                <rect x="2" y="2" width="9" height="9" stroke="#666" stroke-width="1.2" fill="none" rx="1"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div style="padding: 2px 0;">
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <span style="font-size: 13px; color: #666;">商户名称:</span>
+                                        <span style="font-size: 13px; color: #333;">${escapeHtml(formData.merchantName || formData.companyName)}</span>
+                                    </div>
+                                </div>
+                                <div style="padding: 2px 0;">
+                                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <span style="font-size: 13px; color: #666;">子账户:</span>
+                                            <span style="font-size: 13px; color: #333; font-family: monospace;">${escapedSubaccount}</span>
+                                        </div>
+                                        <button class="copy-btn-icon" onclick="copyMerchantField('subaccount', event)" style="background: none; border: none; cursor: pointer; padding: 4px; display: flex; align-items: center; justify-content: center; border-radius: 3px; transition: background 0.2s; margin-left: 8px;" onmouseover="this.style.background='#f0f0f0'" onmouseout="this.style.background='none'">
+                                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <rect x="5" y="5" width="9" height="9" stroke="#666" stroke-width="1.2" fill="none" rx="1"/>
+                                                <rect x="2" y="2" width="9" height="9" stroke="#666" stroke-width="1.2" fill="none" rx="1"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div style="padding: 2px 0;">
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <span style="font-size: 13px; color: #666;">子账户名称:</span>
+                                        <span style="font-size: 13px; color: #333;">${escapeHtml(formData.subAccountName)}</span>
+                                    </div>
+                                </div>
+                                <div style="padding: 2px 0;">
+                                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <span style="font-size: 13px; color: #666;">KEY 值:</span>
+                                            <span style="font-size: 13px; color: #333; font-family: monospace;">${escapedKey}</span>
+                                        </div>
+                                        <button class="copy-btn-icon" onclick="copyMerchantField('key', event)" style="background: none; border: none; cursor: pointer; padding: 4px; display: flex; align-items: center; justify-content: center; border-radius: 3px; transition: background 0.2s; margin-left: 8px;" onmouseover="this.style.background='#f0f0f0'" onmouseout="this.style.background='none'">
+                                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <rect x="5" y="5" width="9" height="9" stroke="#666" stroke-width="1.2" fill="none" rx="1"/>
+                                                <rect x="2" y="2" width="9" height="9" stroke="#666" stroke-width="1.2" fill="none" rx="1"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div style="padding: 2px 0;">
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <span style="font-size: 13px; color: #666;">绑定接口类型:</span>
+                                        <span style="font-size: 13px; color: #333;">${escapeHtml(interfaceTypeText)}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="padding: 8px 0 0 0; margin-top: 8px; border-top: 1px solid #e0e0e0;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="font-size: 12px; color: #999; font-style: italic;">配置时间:</span>
+                                <span style="font-size: 12px; color: #999; font-style: italic;">${escapeHtml(new Date().toLocaleString('zh-CN'))}</span>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                            <button class="btn btn-secondary" onclick="closeMerchantConfigSuccessModal()">关闭</button>
+                            <button class="btn btn-primary" id="copyMerchantConfigBtn" onclick="copyMerchantConfigInfo(event)">
+                                <span style="margin-right: 6px;">📋</span>复制信息
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            
+            // Show modal with high z-index
+            console.log('[Merchant Config] Setting modal display to flex');
+            modal.style.display = 'flex';
+            modal.style.zIndex = '10000';
+            
+            // Force visibility
+            modal.style.visibility = 'visible';
+            modal.style.opacity = '1';
+            
+            console.log('[Merchant Config] Modal display:', modal.style.display);
+            console.log('[Merchant Config] Modal z-index:', modal.style.zIndex);
+            console.log('[Merchant Config] Modal computed style:', window.getComputedStyle(modal).display);
+            
+            // Verify modal is in DOM
+            if (!document.body.contains(modal)) {
+                console.error('[Merchant Config] ERROR: Modal not in DOM! Re-adding...');
+                document.body.appendChild(modal);
+                modal.style.display = 'flex';
+                modal.style.zIndex = '10000';
+            }
+            
+            // Add ESC key listener
+            const escHandler = function(e) {
+                if (e.key === 'Escape') {
+                    closeMerchantConfigSuccessModal();
+                    document.removeEventListener('keydown', escHandler);
+                }
+            };
+            document.addEventListener('keydown', escHandler);
+            
+            console.log('[Merchant Config] ===== Popup should now be visible =====');
+        }
+        
+        // Close Merchant Config Success Modal
+        function closeMerchantConfigSuccessModal() {
+            console.log('[Merchant Config] ===== closeMerchantConfigSuccessModal CALLED =====');
+            const modal = document.getElementById('merchantConfigSuccessModal');
+            if (modal) {
+                console.log('[Merchant Config] Hiding modal');
+                modal.style.display = 'none';
+            }
+            // Reset form and return to list only after user closes the popup
+            console.log('[Merchant Config] Resetting form and hiding config card');
+            resetMerchantForm();
+            hideMerchantConfigForm();
+            // Reload merchant list to show the new merchant
+            if (typeof loadMerchantList === 'function') {
+                loadMerchantList();
+            }
+        }
+        
+        // Copy Merchant Config Info
+        function copyMerchantConfigInfo(event) {
+            if (event) {
+                event.stopPropagation();
+            }
+            
+            // Get the original text (not escaped)
+            const text = window.merchantConfigInfoText && window.merchantConfigInfoText.original 
+                ? window.merchantConfigInfoText.original 
+                : (document.getElementById('merchantConfigInfoText') ? document.getElementById('merchantConfigInfoText').textContent : '');
+            
+            if (!text) return;
+            
+            // Try modern clipboard API first
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => {
+                    // Show feedback
+                    const copyBtn = document.getElementById('copyMerchantConfigBtn');
+                    if (copyBtn) {
+                        const originalText = copyBtn.innerHTML;
+                        copyBtn.innerHTML = '<span style="margin-right: 6px;">✓</span>已复制';
+                        copyBtn.style.background = '#28a745';
+                        copyBtn.disabled = true;
+                        setTimeout(() => {
+                            copyBtn.innerHTML = originalText;
+                            copyBtn.style.background = '';
+                            copyBtn.disabled = false;
+                        }, 2000);
+                    }
+                }).catch(err => {
+                    console.error('Failed to copy:', err);
+                    fallbackCopyText(text);
+                });
+            } else {
+                // Fallback for older browsers
+                fallbackCopyText(text);
+            }
+        }
+        
+        // Fallback copy method
+        function fallbackCopyText(text) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-999999px';
+            textArea.style.top = '-999999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                const copyBtn = document.getElementById('copyMerchantConfigBtn');
+                if (copyBtn) {
+                    const originalText = copyBtn.innerHTML;
+                    copyBtn.innerHTML = '<span style="margin-right: 6px;">✓</span>已复制';
+                    copyBtn.style.background = '#28a745';
+                    setTimeout(() => {
+                        copyBtn.innerHTML = originalText;
+                        copyBtn.style.background = '';
+                    }, 2000);
+                }
+            } catch (err) {
+                console.error('Fallback copy failed:', err);
+                alert('复制失败，请手动选择文本复制');
+            }
+            document.body.removeChild(textArea);
+        }
+        
+        // Expose functions globally
+        // Copy individual merchant field (MID, subaccount, or KEY)
+        function copyMerchantField(fieldName, event) {
+            if (event) {
+                event.stopPropagation();
+            }
+            
+            const fieldValue = window.merchantConfigInfoText && window.merchantConfigInfoText[fieldName];
+            if (!fieldValue) {
+                console.error('[Merchant Config] Field not found:', fieldName);
+                return;
+            }
+            
+            // Try modern clipboard API first
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(fieldValue).then(() => {
+                    // Show feedback on the button
+                    if (event && event.target) {
+                        const btn = event.target.closest('button');
+                        if (btn) {
+                            const originalHTML = btn.innerHTML;
+                            btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.5 4.5L6 12L2.5 8.5" stroke="#28a745" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+                            btn.style.background = '#e8f5e9';
+                            setTimeout(() => {
+                                btn.innerHTML = originalHTML;
+                                btn.style.background = '';
+                            }, 1500);
+                        }
+                    }
+                }).catch(err => {
+                    console.error('[Merchant Config] Failed to copy:', err);
+                    fallbackCopyText(fieldValue);
+                });
+            } else {
+                // Fallback for older browsers
+                fallbackCopyText(fieldValue);
+            }
+        }
+        
+        window.closeMerchantConfigSuccessModal = closeMerchantConfigSuccessModal;
+        window.copyMerchantConfigInfo = copyMerchantConfigInfo;
+        window.copyMerchantField = copyMerchantField;
+
+        // Reset Merchant Form
+        function resetMerchantForm() {
+            const form = document.getElementById('merchantConfigForm');
+            if (form) {
+                form.reset();
+                // Reset default values
+                document.getElementById('merchant-settlement-currency').value = 'USD';
+                document.getElementById('merchant-binding-interface-type').value = '3-party';
+                // Reset payment method and hide dependent fields
+                document.getElementById('merchant-payment-method').value = '';
+                // Reset card types and channels
+                const cardTypesCheckboxes = document.querySelectorAll('#card-types-dropdown input[type="checkbox"]');
+                const channelsCheckboxes = document.querySelectorAll('#channels-dropdown input[type="checkbox"]');
+                cardTypesCheckboxes.forEach(cb => cb.checked = false);
+                channelsCheckboxes.forEach(cb => cb.checked = false);
+                document.getElementById('card-types-placeholder').textContent = '请选择卡种';
+                document.getElementById('card-types-placeholder').style.color = '#999';
+                document.getElementById('channels-placeholder').textContent = '请选择渠道';
+                document.getElementById('channels-placeholder').style.color = '#999';
+                document.getElementById('merchant-card-types').value = '';
+                document.getElementById('merchant-channels').value = '';
+                // Reset search inputs
+                document.getElementById('card-types-search').value = '';
+                document.getElementById('channels-search').value = '';
+                // Reset filter display
+                document.querySelectorAll('#card-types-options .multi-select-option').forEach(opt => opt.style.display = 'flex');
+                document.querySelectorAll('#channels-options .multi-select-option').forEach(opt => opt.style.display = 'flex');
+                // Reset arrows
+                document.getElementById('card-types-arrow').textContent = '▼';
+                document.getElementById('channels-arrow').textContent = '▼';
+                // Hide card types and channels groups
+                document.getElementById('card-types-group').style.display = 'none';
+                document.getElementById('channels-group').style.display = 'none';
+                document.getElementById('build-button-group').style.display = 'none';
+                document.getElementById('channel-binding-results').style.display = 'none';
+                // Close dropdowns
+                document.querySelectorAll('.multi-select-dropdown').forEach(d => {
+                    d.style.display = 'none';
+                });
+                // Clear password fields
+                document.getElementById('merchant-login-password').value = '';
+                document.getElementById('merchant-confirm-password').value = '';
+            }
+        }
+
+        // Show message helper for merchant config
+        function showMerchantMessage(message, type = 'info') {
+            const messageContainer = document.getElementById('messageContainer');
+            if (messageContainer) {
+                messageContainer.textContent = message;
+                messageContainer.className = `message-container ${type}`;
+                messageContainer.style.display = 'block';
+                
+                // Auto-hide success/info messages after 5 seconds
+                if (type === 'success' || type === 'info') {
+                    setTimeout(() => {
+                        messageContainer.style.display = 'none';
+                    }, 5000);
+                }
+            } else {
+                // Fallback to alert if message container doesn't exist
+                alert(message);
+            }
+        }
+
+        // Merchant List State
+        let merchantListState = {
+            merchants: [],
+            filteredMerchants: [],
+            selectedMerchantIds: new Set(),
+            currentPage: 1,
+            pageSize: 10
+        };
+
+        // Load Merchant List
+        async function loadMerchantList() {
+            try {
+                // Check if we're running from file:// protocol (local file)
+                if (window.location.protocol === 'file:') {
+                    console.warn('Running from file:// protocol, using mock data');
+                    loadMockMerchantData();
+                    renderMerchantTable();
+                    return;
+                }
+                
+                const response = await fetch('/api/merchant/list', {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    merchantListState.merchants = data.merchants || [];
+                    merchantListState.filteredMerchants = [...merchantListState.merchants];
+                } else {
+                    // Use mock data for demo
+                    console.warn('API call failed, using mock data');
+                    loadMockMerchantData();
+                }
+            } catch (error) {
+                console.warn('Failed to load merchants:', error);
+                loadMockMerchantData();
+            }
+            
+            renderMerchantTable();
+        }
+
+        // Load Mock Merchant Data (for demo)
+        function loadMockMerchantData() {
+            merchantListState.merchants = [
+                {
+                    id: '1',
+                    companyName: 'TEST',
+                    merchantId: '1040601',
+                    merchantName: 'TASIC',
+                    creditRating: 'B',
+                    salesPerson: 'starsaas demo sales',
+                    riskLevel: '低',
+                    registrationDate: '2026-01-22 09:12:28',
+                    contractStartDate: '2026-01-22 00:00:00',
+                    contractEndDate: '2027-01-22 00:00:00',
+                    status: '正常'
+                },
+                {
+                    id: '2',
+                    companyName: 'TEST',
+                    merchantId: '1040602',
+                    merchantName: 'sny01',
+                    creditRating: 'B',
+                    salesPerson: 'starsaas demo sales',
+                    riskLevel: '低',
+                    registrationDate: '2026-01-22 09:15:45',
+                    contractStartDate: '2026-01-22 00:00:00',
+                    contractEndDate: '2027-01-22 00:00:00',
+                    status: '正常'
+                },
+                {
+                    id: '3',
+                    companyName: 'TEST',
+                    merchantId: '1040603',
+                    merchantName: '小红帽',
+                    creditRating: 'B',
+                    salesPerson: 'starsaas demo sales',
+                    riskLevel: '低',
+                    registrationDate: '2026-01-22 10:20:15',
+                    contractStartDate: '2026-01-22 00:00:00',
+                    contractEndDate: '2027-01-22 00:00:00',
+                    status: '未激活'
+                },
+                {
+                    id: '4',
+                    companyName: 'TEST',
+                    merchantId: '1040604',
+                    merchantName: 'AAAL3333@gmail.com',
+                    creditRating: 'B',
+                    salesPerson: 'starsaas demo sales',
+                    riskLevel: '低',
+                    registrationDate: '2026-01-22 11:30:00',
+                    contractStartDate: '2026-01-22 00:00:00',
+                    contractEndDate: '2027-01-22 00:00:00',
+                    status: '正常'
+                },
+                {
+                    id: '5',
+                    companyName: 'TEST',
+                    merchantId: '1040605',
+                    merchantName: 'Merchant005',
+                    creditRating: 'B',
+                    salesPerson: 'starsaas demo sales',
+                    riskLevel: '低',
+                    registrationDate: '2026-01-22 12:45:30',
+                    contractStartDate: '2026-01-22 00:00:00',
+                    contractEndDate: '2027-01-22 00:00:00',
+                    status: '未激活'
+                }
+            ];
+            merchantListState.filteredMerchants = [...merchantListState.merchants];
+        }
+
+        // Render Merchant Table
+        function renderMerchantTable() {
+            const tbody = document.getElementById('merchantTableBody');
+            if (!tbody) return;
+
+            // Calculate pagination
+            const startIndex = (merchantListState.currentPage - 1) * merchantListState.pageSize;
+            const endIndex = startIndex + merchantListState.pageSize;
+            const pageData = merchantListState.filteredMerchants.slice(startIndex, endIndex);
+
+            // Clear existing rows
+            tbody.innerHTML = '';
+
+            // Render rows
+            pageData.forEach((merchant) => {
+                const row = document.createElement('tr');
+                row.dataset.id = merchant.id;
+                row.onclick = () => selectMerchantRow(merchant.id);
+                
+                const isSelected = merchantListState.selectedMerchantIds.has(merchant.id);
+                const statusClass = merchant.status === '正常' ? 'status-active' : 'status-inactive';
+                
+                row.innerHTML = `
+                    <td onclick="event.stopPropagation(); toggleMerchantSelection('${merchant.id}')">
+                        <input type="checkbox" ${isSelected ? 'checked' : ''} 
+                               onclick="event.stopPropagation(); toggleMerchantSelection('${merchant.id}')">
+                    </td>
+                    <td>${escapeHtml(merchant.companyName || '')}</td>
+                    <td>${escapeHtml(merchant.merchantId || '')}</td>
+                    <td>${escapeHtml(merchant.merchantName || '')}</td>
+                    <td>${escapeHtml(merchant.creditRating || '')}</td>
+                    <td>${escapeHtml(merchant.salesPerson || '')}</td>
+                    <td style="color: #d32f2f;">${escapeHtml(merchant.riskLevel || '')}</td>
+                    <td>${escapeHtml(merchant.registrationDate || '')}</td>
+                    <td>${escapeHtml(merchant.contractStartDate || '')}</td>
+                    <td>${escapeHtml(merchant.contractEndDate || '')}</td>
+                    <td><span class="status-badge ${statusClass}">${escapeHtml(merchant.status || '')}</span></td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            // Update pagination info
+            updateMerchantPaginationInfo();
+            updateMerchantActionButtons();
+        }
+
+        // Select Merchant Row
+        function selectMerchantRow(merchantId) {
+            toggleMerchantSelection(merchantId);
+        }
+
+        // Toggle Merchant Selection
+        function toggleMerchantSelection(merchantId) {
+            if (merchantListState.selectedMerchantIds.has(merchantId)) {
+                merchantListState.selectedMerchantIds.delete(merchantId);
+            } else {
+                merchantListState.selectedMerchantIds.add(merchantId);
+            }
+            renderMerchantTable();
+        }
+
+        // Toggle Select All Merchants
+        function toggleSelectAllMerchants() {
+            const checkbox = document.getElementById('select-all-merchants');
+            const startIndex = (merchantListState.currentPage - 1) * merchantListState.pageSize;
+            const endIndex = startIndex + merchantListState.pageSize;
+            const pageData = merchantListState.filteredMerchants.slice(startIndex, endIndex);
+            
+            if (checkbox.checked) {
+                pageData.forEach(merchant => {
+                    merchantListState.selectedMerchantIds.add(merchant.id);
+                });
+            } else {
+                pageData.forEach(merchant => {
+                    merchantListState.selectedMerchantIds.delete(merchant.id);
+                });
+            }
+            renderMerchantTable();
+        }
+
+        // Apply Merchant Filters
+        function applyMerchantFilters() {
+            const industry = document.getElementById('filter-industry').value;
+            const region = document.getElementById('filter-region').value;
+
+            merchantListState.filteredMerchants = merchantListState.merchants.filter(merchant => {
+                // Add filter logic here based on industry and region
+                // For now, just return all if no filters selected
+                return true;
+            });
+
+            merchantListState.currentPage = 1;
+            renderMerchantTable();
+        }
+
+        // Clear Merchant Filters
+        function clearMerchantFilters() {
+            document.getElementById('filter-industry').value = '';
+            document.getElementById('filter-region').value = '';
+            merchantListState.filteredMerchants = [...merchantListState.merchants];
+            merchantListState.currentPage = 1;
+            renderMerchantTable();
+        }
+
+        // Change Merchant Page
+        function changeMerchantPage(direction) {
+            const totalPages = Math.ceil(merchantListState.filteredMerchants.length / merchantListState.pageSize);
+            const newPage = merchantListState.currentPage + direction;
+            
+            if (newPage >= 1 && newPage <= totalPages) {
+                merchantListState.currentPage = newPage;
+                renderMerchantTable();
+            }
+        }
+
+        // Change Merchant Page Size
+        function changeMerchantPageSize() {
+            const select = document.getElementById('merchantPageSizeSelect');
+            merchantListState.pageSize = parseInt(select.value);
+            merchantListState.currentPage = 1;
+            renderMerchantTable();
+        }
+
+        // Update Merchant Pagination Info
+        function updateMerchantPaginationInfo() {
+            const startIndex = (merchantListState.currentPage - 1) * merchantListState.pageSize + 1;
+            const endIndex = Math.min(
+                merchantListState.currentPage * merchantListState.pageSize,
+                merchantListState.filteredMerchants.length
+            );
+            const total = merchantListState.filteredMerchants.length;
+            
+            document.getElementById('merchantPaginationRange').textContent = 
+                total > 0 ? `${startIndex}~${endIndex}` : '0~0';
+            
+            const totalPages = Math.ceil(total / merchantListState.pageSize);
+            document.getElementById('merchantPrevPageBtn').disabled = merchantListState.currentPage <= 1;
+            document.getElementById('merchantNextPageBtn').disabled = merchantListState.currentPage >= totalPages;
+        }
+
+        // Update Merchant Action Buttons
+        function updateMerchantActionButtons() {
+            const hasSelection = merchantListState.selectedMerchantIds.size > 0;
+            document.getElementById('merchant-activate-btn-action').disabled = !hasSelection;
+            document.getElementById('merchant-modify-btn').disabled = !hasSelection;
+            document.getElementById('merchant-deactivate-btn').disabled = !hasSelection;
+            document.getElementById('merchant-restore-btn').disabled = !hasSelection;
+            document.getElementById('merchant-details-btn').disabled = !hasSelection;
+            document.getElementById('merchant-copy-btn').disabled = !hasSelection;
+        }
+
+        // Show Merchant Config Form
+        function showMerchantConfigForm() {
+            document.getElementById('merchantSummarySection').style.display = 'none';
+            document.getElementById('merchantConfigFormCard').style.display = 'block';
+            resetMerchantForm();
+        }
+
+        // Hide Merchant Config Form
+        function hideMerchantConfigForm() {
+            console.log('[Merchant Config] hideMerchantConfigForm called');
+            document.getElementById('merchantSummarySection').style.display = 'block';
+            document.getElementById('merchantConfigFormCard').style.display = 'none';
+            loadMerchantList(); // Reload list in case new merchant was added
+        }
+
+        // Merchant Action Functions
+        function activateSelectedMerchant() {
+            if (merchantListState.selectedMerchantIds.size === 0) return;
+            // Implement activation logic
+            showMerchantMessage('激活功能待实现', 'info');
+        }
+
+        function modifySelectedMerchant() {
+            if (merchantListState.selectedMerchantIds.size === 0) return;
+            // Implement modify logic
+            showMerchantMessage('修改功能待实现', 'info');
+        }
+
+        function deactivateSelectedMerchant() {
+            if (merchantListState.selectedMerchantIds.size === 0) return;
+            // Implement deactivate logic
+            showMerchantMessage('停用功能待实现', 'info');
+        }
+
+        function restoreSelectedMerchant() {
+            if (merchantListState.selectedMerchantIds.size === 0) return;
+            // Implement restore logic
+            showMerchantMessage('恢复功能待实现', 'info');
+        }
+
+        function viewMerchantDetails() {
+            if (merchantListState.selectedMerchantIds.size === 0) return;
+            // Implement details view logic
+            showMerchantMessage('详情功能待实现', 'info');
+        }
+
+        function copySelectedMerchant() {
+            if (merchantListState.selectedMerchantIds.size === 0) return;
+            // Implement copy logic
+            showMerchantMessage('复制功能待实现', 'info');
+        }
+
+        // Escape HTML helper
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Multi-Select Dropdown Functions
+        function toggleMultiSelect(type) {
+            const dropdown = document.getElementById(`${type}-dropdown`);
+            const arrow = document.getElementById(`${type}-arrow`);
+            const isOpen = dropdown.style.display === 'block';
+            
+            // Close all other multi-selects
+            document.querySelectorAll('.multi-select-dropdown').forEach(d => {
+                if (d.id !== `${type}-dropdown`) {
+                    d.style.display = 'none';
+                    const otherType = d.id.replace('-dropdown', '');
+                    const otherArrow = document.getElementById(`${otherType}-arrow`);
+                    if (otherArrow) {
+                        otherArrow.textContent = '▼';
+                        otherArrow.style.transform = 'rotate(0deg)';
+                    }
+                }
+            });
+            
+            if (isOpen) {
+                dropdown.style.display = 'none';
+                arrow.textContent = '▼';
+                arrow.style.transform = 'rotate(0deg)';
+            } else {
+                dropdown.style.display = 'block';
+                arrow.textContent = '▲';
+                arrow.style.transform = 'rotate(0deg)';
+                // Focus search input
+                const searchInput = document.getElementById(`${type}-search`);
+                if (searchInput) {
+                    setTimeout(() => searchInput.focus(), 100);
+                }
+            }
+        }
+
+        // Filter Multi-Select Options
+        function filterMultiSelect(type, searchTerm) {
+            const optionsContainer = document.getElementById(`${type}-options`);
+            const options = optionsContainer.querySelectorAll('.multi-select-option');
+            const term = searchTerm.toLowerCase();
+            
+            options.forEach(option => {
+                const label = option.querySelector('label').textContent.toLowerCase();
+                if (label.includes(term)) {
+                    option.style.display = 'flex';
+                } else {
+                    option.style.display = 'none';
+                }
+            });
+        }
+
+        function updateMultiSelect(type) {
+            const checkboxes = document.querySelectorAll(`#${type}-dropdown input[type="checkbox"]`);
+            const selected = Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.value);
+            const placeholder = document.getElementById(`${type}-placeholder`);
+            const hiddenInput = document.getElementById(`merchant-${type}`);
+            
+            // Get display names for channels
+            const channelNames = {
+                'ysepay': 'YSEPAY',
+                'rumble': 'RUMBLE',
+                'evonet': 'EVONET',
+                'paysaas': 'PAYSAAS'
+            };
+            
+            if (selected.length === 0) {
+                placeholder.textContent = type === 'card-types' ? '请选择卡种' : '请选择渠道';
+                placeholder.style.color = '#999';
+                hiddenInput.value = '';
+                hiddenInput.setCustomValidity('请至少选择一个选项');
+            } else {
+                // For channels, show display names
+                const displayText = type === 'channels' 
+                    ? selected.map(v => channelNames[v] || v).join(', ')
+                    : selected.join(', ');
+                placeholder.textContent = displayText;
+                placeholder.style.color = '#333';
+                hiddenInput.value = JSON.stringify(selected);
+                hiddenInput.setCustomValidity('');
+            }
+            
+            // Show/hide build button based on channel selection
+            if (type === 'channels') {
+                const buildButtonGroup = document.getElementById('build-button-group');
+                if (selected.length > 0) {
+                    buildButtonGroup.style.display = 'block';
+                } else {
+                    buildButtonGroup.style.display = 'none';
+                    document.getElementById('channel-binding-results').style.display = 'none';
+                }
+            }
+        }
+
+        // Build Channel Binding
+        function buildChannelBinding() {
+            const cardTypesValue = document.getElementById('merchant-card-types').value;
+            const channelsValue = document.getElementById('merchant-channels').value;
+            const paymentMethod = document.getElementById('merchant-payment-method').value;
+            
+            if (!cardTypesValue || !channelsValue) {
+                showMerchantMessage('请先选择卡种和渠道', 'error');
+                return;
+            }
+            
+            const cardTypes = JSON.parse(cardTypesValue);
+            const channels = JSON.parse(channelsValue);
+            
+            // Channel display names and IDs
+            const channelInfo = {
+                'ysepay': { name: 'YSEPAY', id: '69201' },
+                'rumble': { name: 'RUMBLE', id: '77401' },
+                'evonet': { name: 'EVONET', id: '80201' },
+                'paysaas': { name: 'PAYSAAS', id: '81201' }
+            };
+            
+            // Card type display names
+            const cardTypeNames = {
+                'VISA': 'Visa',
+                'MasterCard': 'Master',
+                'JCB': 'JCB',
+                'CUP': 'CUP',
+                'Diners': 'Diners',
+                'Discover': 'Discover',
+                'AMEX': 'AMEX'
+            };
+            
+            // Generate results
+            const results = [];
+            let sequence = 1;
+            
+            channels.forEach(channel => {
+                const channelData = channelInfo[channel];
+                if (!channelData) return;
+                
+                cardTypes.forEach(cardType => {
+                    const cardTypeName = cardTypeNames[cardType] || cardType;
+                    results.push({
+                        id: `${channel}-${cardType}-${sequence}`,
+                        sequence: sequence++,
+                        paymentMethod: paymentMethod === 'credit_card' ? 'Credit Card' : 'Mix',
+                        cardType: cardTypeName,
+                        acquirer: `${channelData.name}(${channelData.name})`,
+                        channel: `${channelData.name}${cardTypeName}(${channelData.id})`,
+                        boundStatus: 'Normal',
+                        remarks: ''
+                    });
+                });
+            });
+            
+            // Render results table
+            renderChannelBindingResults(results);
+            document.getElementById('channel-binding-results').style.display = 'block';
+            
+            // Show success message
+            showMerchantMessage(`成功构建 ${results.length} 条通道绑定`, 'success');
+        }
+
+        // Channel Binding Results State
+        let channelBindingResults = [];
+
+        // Render Channel Binding Results
+        function renderChannelBindingResults(results) {
+            channelBindingResults = results;
+            const tbody = document.getElementById('channelBindingResultsBody');
+            tbody.innerHTML = '';
+            
+            results.forEach(result => {
+                const row = document.createElement('tr');
+                row.dataset.id = result.id;
+                row.innerHTML = `
+                    <td>
+                        <input type="checkbox" class="result-checkbox" value="${result.id}" onchange="updateDeleteButtonState(); updateSelectAllState()">
+                    </td>
+                    <td>${result.sequence}</td>
+                    <td>${escapeHtml(result.paymentMethod)}</td>
+                    <td>${escapeHtml(result.cardType)}</td>
+                    <td>${escapeHtml(result.acquirer)}</td>
+                    <td>${escapeHtml(result.channel)}</td>
+                    <td>${escapeHtml(result.boundStatus)}</td>
+                    <td>${escapeHtml(result.remarks)}</td>
+                    <td>
+                        <a href="#" class="delete-link" onclick="deleteChannelBinding('${result.id}'); return false;">Delete</a>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+            
+            // Update delete button state
+            updateDeleteButtonState();
+        }
+
+        // Delete Channel Binding (single or multiple)
+        function deleteChannelBinding(id) {
+            if (id) {
+                // Delete single row
+                const row = document.querySelector(`tr[data-id="${id}"]`);
+                if (row) {
+                    row.remove();
+                    channelBindingResults = channelBindingResults.filter(r => r.id !== id);
+                }
+            } else {
+                // Delete selected rows
+                const selectedCheckboxes = document.querySelectorAll('#channelBindingResultsBody .result-checkbox:checked');
+                const selectedIds = Array.from(selectedCheckboxes).map(cb => cb.value);
+                
+                if (selectedIds.length === 0) {
+                    showMerchantMessage('请先选择要删除的项目', 'error');
+                    return;
+                }
+                
+                selectedIds.forEach(selectedId => {
+                    const row = document.querySelector(`tr[data-id="${selectedId}"]`);
+                    if (row) {
+                        row.remove();
+                    }
+                });
+                
+                channelBindingResults = channelBindingResults.filter(r => !selectedIds.includes(r.id));
+            }
+            
+            // Update sequence numbers
+            const rows = document.querySelectorAll('#channelBindingResultsBody tr');
+            rows.forEach((row, index) => {
+                row.querySelector('td:nth-child(2)').textContent = index + 1;
+            });
+            
+            // Update select all checkbox
+            const selectAllCheckbox = document.getElementById('select-all-results');
+            if (selectAllCheckbox) {
+                selectAllCheckbox.checked = false;
+                selectAllCheckbox.indeterminate = false;
+            }
+            
+            // Update delete button state
+            updateDeleteButtonState();
+            updateSelectAllState();
+        }
+
+        // Delete Selected Channel Bindings
+        function deleteSelectedChannelBindings() {
+            deleteChannelBinding(null);
+        }
+
+        // Toggle Select All Results
+        function toggleSelectAllResults() {
+            const checkbox = document.getElementById('select-all-results');
+            const checkboxes = document.querySelectorAll('#channelBindingResultsBody .result-checkbox');
+            checkboxes.forEach(cb => {
+                cb.checked = checkbox.checked;
+            });
+            updateDeleteButtonState();
+            
+            // Update select all checkbox state based on individual selections
+            const allChecked = checkboxes.length > 0 && Array.from(checkboxes).every(cb => cb.checked);
+            const someChecked = Array.from(checkboxes).some(cb => cb.checked);
+            if (checkbox) {
+                checkbox.checked = allChecked;
+                checkbox.indeterminate = someChecked && !allChecked;
+            }
+        }
+
+        // Update Delete Button State
+        function updateDeleteButtonState() {
+            const selectedCheckboxes = document.querySelectorAll('#channelBindingResultsBody .result-checkbox:checked');
+            const deleteButton = document.getElementById('delete-selected-results-btn');
+            const selectedCountSpan = document.getElementById('selected-count');
+            const selectedCount = selectedCheckboxes.length;
+            
+            if (deleteButton && selectedCountSpan) {
+                // Only show button when 2 or more items are selected
+                if (selectedCount >= 2) {
+                    deleteButton.style.display = 'block';
+                    selectedCountSpan.textContent = selectedCount;
+                } else {
+                    deleteButton.style.display = 'none';
+                }
+            }
+        }
+
+        // Update Select All Checkbox State
+        function updateSelectAllState() {
+            const checkboxes = document.querySelectorAll('#channelBindingResultsBody .result-checkbox');
+            const selectAllCheckbox = document.getElementById('select-all-results');
+            
+            if (selectAllCheckbox && checkboxes.length > 0) {
+                const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+                const someChecked = Array.from(checkboxes).some(cb => cb.checked);
+                selectAllCheckbox.checked = allChecked;
+                selectAllCheckbox.indeterminate = someChecked && !allChecked;
+            }
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.multi-select-wrapper')) {
+                document.querySelectorAll('.multi-select-dropdown').forEach(d => {
+                    d.style.display = 'none';
+                });
+            }
+        });
+
+        // Expose functions globally
+        window.resetMerchantForm = resetMerchantForm;
+        window.handlePaymentMethodChange = handlePaymentMethodChange;
+        window.toggleMultiSelect = toggleMultiSelect;
+        window.updateMultiSelect = updateMultiSelect;
+        window.filterMultiSelect = filterMultiSelect;
+        window.buildChannelBinding = buildChannelBinding;
+        window.deleteChannelBinding = deleteChannelBinding;
+        window.deleteSelectedChannelBindings = deleteSelectedChannelBindings;
+        window.toggleSelectAllResults = toggleSelectAllResults;
+        window.updateDeleteButtonState = updateDeleteButtonState;
+        window.updateSelectAllState = updateSelectAllState;
+        window.showMerchantConfigForm = showMerchantConfigForm;
+        window.hideMerchantConfigForm = hideMerchantConfigForm;
+        window.applyMerchantFilters = applyMerchantFilters;
+        window.clearMerchantFilters = clearMerchantFilters;
+        window.changeMerchantPage = changeMerchantPage;
+        window.changeMerchantPageSize = changeMerchantPageSize;
+        window.toggleMerchantSelection = toggleMerchantSelection;
+        window.toggleSelectAllMerchants = toggleSelectAllMerchants;
+        window.selectMerchantRow = selectMerchantRow;
+        window.activateSelectedMerchant = activateSelectedMerchant;
+        window.modifySelectedMerchant = modifySelectedMerchant;
+        window.deactivateSelectedMerchant = deactivateSelectedMerchant;
+        window.restoreSelectedMerchant = restoreSelectedMerchant;
+        window.viewMerchantDetails = viewMerchantDetails;
+        window.copySelectedMerchant = copySelectedMerchant;
 
         // Platform Configuration
         const platformHintImages = {
@@ -1743,7 +3549,77 @@
 
         // Load Platform Merchant Options
         async function loadPlatformMerchantOptions() {
+            const platformMerchantSelect = document.getElementById('platform-merchant-name');
+            if (!platformMerchantSelect) return;
+
+            // Default merchants to use if API fails or main select is empty
+            const defaultMerchants = [
+                { id: 'starsaas', name: 'STARSAAS' },
+                { id: 'nbcpay', name: 'NbcPay' },
+                { id: 'nexpay', name: 'NexPay' }
+            ];
+
             try {
+                // Check if we're running from file:// protocol (local file)
+                if (window.location.protocol === 'file:') {
+                    console.warn('Running from file:// protocol, using fallback for platform merchants');
+                    // Fallback: use same merchants as channel binding form
+                    // Find the select element specifically in the channel binding tab
+                    const channelBindingTab = document.getElementById('channel-binding-tab');
+                    let mainMerchantSelect = null;
+                    if (channelBindingTab) {
+                        mainMerchantSelect = channelBindingTab.querySelector('select#merchant-name');
+                    }
+                    // Fallback: try direct getElementById but verify it's a select
+                    if (!mainMerchantSelect) {
+                        const directSelect = document.getElementById('merchant-name');
+                        if (directSelect && directSelect.tagName === 'SELECT') {
+                            mainMerchantSelect = directSelect;
+                        }
+                    }
+                    if (mainMerchantSelect && platformMerchantSelect) {
+                        // Use querySelectorAll as fallback if options property doesn't exist
+                        let options = [];
+                        if (mainMerchantSelect.options) {
+                            options = Array.from(mainMerchantSelect.options);
+                        } else {
+                            options = Array.from(mainMerchantSelect.querySelectorAll('option'));
+                        }
+                        
+                        // Check if main select has actual merchant options (more than just placeholder)
+                        const hasMerchants = options.length > 1 || options.some(opt => opt.value && opt.value !== '');
+                        
+                        if (hasMerchants) {
+                            platformMerchantSelect.innerHTML = '<option value="">请选择商户名</option>';
+                            options.forEach(option => {
+                                if (option.value) {
+                                    const newOption = option.cloneNode(true);
+                                    platformMerchantSelect.appendChild(newOption);
+                                }
+                            });
+                        } else {
+                            // Main select is empty, use default merchants
+                            platformMerchantSelect.innerHTML = '<option value="">请选择商户名</option>';
+                            defaultMerchants.forEach(merchant => {
+                                const option = document.createElement('option');
+                                option.value = merchant.id;
+                                option.textContent = merchant.name;
+                                platformMerchantSelect.appendChild(option);
+                            });
+                        }
+                    } else {
+                        // No main select found, use default merchants
+                        platformMerchantSelect.innerHTML = '<option value="">请选择商户名</option>';
+                        defaultMerchants.forEach(merchant => {
+                            const option = document.createElement('option');
+                            option.value = merchant.id;
+                            option.textContent = merchant.name;
+                            platformMerchantSelect.appendChild(option);
+                        });
+                    }
+                    return;
+                }
+                
                 const response = await fetch('/api/merchants/list', {
                     method: 'GET',
                     headers: { 'X-Requested-With': 'XMLHttpRequest' }
@@ -1762,33 +3638,125 @@
                         });
                     }
                 } else {
-                    // Fallback: use same merchants as channel binding form
-                    const mainMerchantSelect = document.getElementById('merchant-name');
-                    const platformMerchantSelect = document.getElementById('platform-merchant-name');
+                    // Fallback: use same merchants as channel binding form or defaults
+                    // Find the select element specifically in the channel binding tab
+                    const channelBindingTab = document.getElementById('channel-binding-tab');
+                    let mainMerchantSelect = null;
+                    if (channelBindingTab) {
+                        mainMerchantSelect = channelBindingTab.querySelector('select#merchant-name');
+                    }
+                    // Fallback: try direct getElementById but verify it's a select
+                    if (!mainMerchantSelect) {
+                        const directSelect = document.getElementById('merchant-name');
+                        if (directSelect && directSelect.tagName === 'SELECT') {
+                            mainMerchantSelect = directSelect;
+                        }
+                    }
                     if (mainMerchantSelect && platformMerchantSelect) {
-                        const options = Array.from(mainMerchantSelect.options);
-                        platformMerchantSelect.innerHTML = '<option value="">请选择商户名</option>';
-                        options.forEach(option => {
-                            if (option.value) {
-                                const newOption = option.cloneNode(true);
-                                platformMerchantSelect.appendChild(newOption);
+                        try {
+                            let options = [];
+                            if (mainMerchantSelect.options) {
+                                options = Array.from(mainMerchantSelect.options);
+                            } else {
+                                options = Array.from(mainMerchantSelect.querySelectorAll('option'));
                             }
+                            
+                            // Check if main select has actual merchant options
+                            const hasMerchants = options.length > 1 || options.some(opt => opt.value && opt.value !== '');
+                            
+                            if (hasMerchants) {
+                                platformMerchantSelect.innerHTML = '<option value="">请选择商户名</option>';
+                                options.forEach(option => {
+                                    if (option.value) {
+                                        const newOption = option.cloneNode(true);
+                                        platformMerchantSelect.appendChild(newOption);
+                                    }
+                                });
+                            } else {
+                                // Main select is empty, use default merchants
+                                platformMerchantSelect.innerHTML = '<option value="">请选择商户名</option>';
+                                defaultMerchants.forEach(merchant => {
+                                    const option = document.createElement('option');
+                                    option.value = merchant.id;
+                                    option.textContent = merchant.name;
+                                    platformMerchantSelect.appendChild(option);
+                                });
+                            }
+                        } catch (err) {
+                            console.warn('Failed to copy merchant options:', err);
+                            // Use default merchants on error
+                            platformMerchantSelect.innerHTML = '<option value="">请选择商户名</option>';
+                            defaultMerchants.forEach(merchant => {
+                                const option = document.createElement('option');
+                                option.value = merchant.id;
+                                option.textContent = merchant.name;
+                                platformMerchantSelect.appendChild(option);
+                            });
+                        }
+                    } else {
+                        // No main select found, use default merchants
+                        platformMerchantSelect.innerHTML = '<option value="">请选择商户名</option>';
+                        defaultMerchants.forEach(merchant => {
+                            const option = document.createElement('option');
+                            option.value = merchant.id;
+                            option.textContent = merchant.name;
+                            platformMerchantSelect.appendChild(option);
                         });
                     }
                 }
             } catch (error) {
                 console.warn('Failed to load platform merchants:', error);
-                // Fallback: use same merchants as channel binding form
+                // Fallback: use same merchants as channel binding form or defaults
                 const mainMerchantSelect = document.getElementById('merchant-name');
-                const platformMerchantSelect = document.getElementById('platform-merchant-name');
                 if (mainMerchantSelect && platformMerchantSelect) {
-                    const options = Array.from(mainMerchantSelect.options);
-                    platformMerchantSelect.innerHTML = '<option value="">请选择商户名</option>';
-                    options.forEach(option => {
-                        if (option.value) {
-                            const newOption = option.cloneNode(true);
-                            platformMerchantSelect.appendChild(newOption);
+                    try {
+                        let options = [];
+                        if (mainMerchantSelect.options) {
+                            options = Array.from(mainMerchantSelect.options);
+                        } else {
+                            options = Array.from(mainMerchantSelect.querySelectorAll('option'));
                         }
+                        
+                        // Check if main select has actual merchant options
+                        const hasMerchants = options.length > 1 || options.some(opt => opt.value && opt.value !== '');
+                        
+                        if (hasMerchants) {
+                            platformMerchantSelect.innerHTML = '<option value="">请选择商户名</option>';
+                            options.forEach(option => {
+                                if (option.value) {
+                                    const newOption = option.cloneNode(true);
+                                    platformMerchantSelect.appendChild(newOption);
+                                }
+                            });
+                        } else {
+                            // Main select is empty, use default merchants
+                            platformMerchantSelect.innerHTML = '<option value="">请选择商户名</option>';
+                            defaultMerchants.forEach(merchant => {
+                                const option = document.createElement('option');
+                                option.value = merchant.id;
+                                option.textContent = merchant.name;
+                                platformMerchantSelect.appendChild(option);
+                            });
+                        }
+                    } catch (err) {
+                        console.warn('Failed to copy merchant options:', err);
+                        // Use default merchants on error
+                        platformMerchantSelect.innerHTML = '<option value="">请选择商户名</option>';
+                        defaultMerchants.forEach(merchant => {
+                            const option = document.createElement('option');
+                            option.value = merchant.id;
+                            option.textContent = merchant.name;
+                            platformMerchantSelect.appendChild(option);
+                        });
+                    }
+                } else {
+                    // No main select found, use default merchants
+                    platformMerchantSelect.innerHTML = '<option value="">请选择商户名</option>';
+                    defaultMerchants.forEach(merchant => {
+                        const option = document.createElement('option');
+                        option.value = merchant.id;
+                        option.textContent = merchant.name;
+                        platformMerchantSelect.appendChild(option);
                     });
                 }
             }
@@ -1830,41 +3798,83 @@
             }
 
             // Fallback: try to get from main form if same merchant
-            const mainMerchantSelect = document.getElementById('merchant-name');
+            // Find the select element specifically in the channel binding tab
+            const channelBindingTab = document.getElementById('channel-binding-tab');
+            let mainMerchantSelect = null;
+            if (channelBindingTab) {
+                mainMerchantSelect = channelBindingTab.querySelector('select#merchant-name');
+            }
+            // Fallback: try direct getElementById but verify it's a select
+            if (!mainMerchantSelect) {
+                const directSelect = document.getElementById('merchant-name');
+                if (directSelect && directSelect.tagName === 'SELECT') {
+                    mainMerchantSelect = directSelect;
+                }
+            }
             const mainSubAccountSelect = document.getElementById('sub-account');
             
             if (mainMerchantSelect && mainSubAccountSelect && mainMerchantSelect.value === merchantId) {
                 const options = Array.from(mainSubAccountSelect.options);
-                subAccountSelect.innerHTML = '<option value="">请选择子账号</option>';
-                options.forEach(option => {
-                    if (option.value) {
-                        const newOption = option.cloneNode(true);
-                        subAccountSelect.appendChild(newOption);
-                    }
-                });
-                subAccountSelect.disabled = false;
+                const hasSubAccounts = options.length > 1 || options.some(opt => opt.value && opt.value !== '');
+                
+                if (hasSubAccounts) {
+                    subAccountSelect.innerHTML = '<option value="">请选择子账号</option>';
+                    options.forEach(option => {
+                        if (option.value) {
+                            const newOption = option.cloneNode(true);
+                            subAccountSelect.appendChild(newOption);
+                        }
+                    });
+                    subAccountSelect.disabled = false;
+                } else {
+                    // Main sub-account select is empty, use default sub-accounts based on merchant
+                    loadDefaultPlatformSubAccounts(merchantId, subAccountSelect);
+                }
             } else {
-                // Fallback: use mock data
-                subAccountSelect.innerHTML = '<option value="">请选择子账号</option>';
-                const mockSubAccounts = [
-                    { id: 'sub1', name: 'STARSAAS' },
-                    { id: 'sub2', name: 'Sub Account 2' },
-                    { id: 'sub3', name: 'Sub Account 3' }
-                ];
-                mockSubAccounts.forEach(subAccount => {
-                    const option = document.createElement('option');
-                    option.value = subAccount.id;
-                    option.textContent = subAccount.name;
-                    subAccountSelect.appendChild(option);
-                });
-                subAccountSelect.disabled = false;
+                // Use default sub-accounts based on merchant
+                loadDefaultPlatformSubAccounts(merchantId, subAccountSelect);
             }
+        }
+
+        // Load Default Platform Sub Accounts
+        function loadDefaultPlatformSubAccounts(merchantId, subAccountSelect) {
+            const defaultSubAccounts = {
+                'starsaas': [
+                    { id: 'starsaas-001', name: 'STARSAAS-001' },
+                    { id: 'starsaas-002', name: 'STARSAAS-002' },
+                    { id: 'starsaas-003', name: 'STARSAAS-003' }
+                ],
+                'nbcpay': [
+                    { id: 'nbcpay-001', name: 'NbcPay-001' },
+                    { id: 'nbcpay-002', name: 'NbcPay-002' }
+                ],
+                'nexpay': [
+                    { id: 'nexpay-001', name: 'NexPay-001' },
+                    { id: 'nexpay-002', name: 'NexPay-002' }
+                ]
+            };
+
+            subAccountSelect.innerHTML = '<option value="">请选择子账号</option>';
+            const subAccounts = defaultSubAccounts[merchantId] || [
+                { id: 'default-001', name: 'Default-001' }
+            ];
+
+            subAccounts.forEach(subAccount => {
+                const option = document.createElement('option');
+                option.value = subAccount.id;
+                option.textContent = subAccount.name;
+                subAccountSelect.appendChild(option);
+            });
+            subAccountSelect.disabled = false;
         }
 
         // Platform and Interface Type Change Handlers
         document.addEventListener('DOMContentLoaded', function() {
             // Load merchant options for platform config
-            loadPlatformMerchantOptions();
+            // Delay slightly to ensure main merchant select is populated first
+            setTimeout(() => {
+                loadPlatformMerchantOptions();
+            }, 200);
 
             // Setup merchant change handler
             const platformMerchantSelect = document.getElementById('platform-merchant-name');
@@ -2149,7 +4159,21 @@
         // Load Merchants for Round Robin
         async function loadMerchantsForRoundRobin() {
             const merchantSelect = document.getElementById('rr-merchant');
+            if (!merchantSelect) {
+                console.warn('[Round Robin] rr-merchant select not found');
+                return;
+            }
+            
             const mainMerchantSelect = document.getElementById('merchant-name');
+            
+            // Default merchants to use if main select is empty
+            const defaultMerchants = [
+                { id: 'starsaas', name: 'STARSAAS' },
+                { id: 'nbcpay', name: 'NbcPay' },
+                { id: 'nexpay', name: 'NexPay' }
+            ];
+            
+            console.log('[Round Robin] Loading merchants, main select has options:', mainMerchantSelect ? (mainMerchantSelect.options ? mainMerchantSelect.options.length : 0) : 'not found');
             
             // Remove existing event listeners by cloning the element
             const newMerchantSelect = merchantSelect.cloneNode(true);
@@ -2157,23 +4181,38 @@
             
             // Load merchants
             if (mainMerchantSelect) {
-                const options = Array.from(mainMerchantSelect.options);
-                newMerchantSelect.innerHTML = '<option value="">请选择</option>';
-                options.forEach(option => {
-                    if (option.value) {
-                        const newOption = option.cloneNode(true);
-                        newMerchantSelect.appendChild(newOption);
-                    }
-                });
+                let options = [];
+                if (mainMerchantSelect.options) {
+                    options = Array.from(mainMerchantSelect.options);
+                } else {
+                    options = Array.from(mainMerchantSelect.querySelectorAll('option'));
+                }
+                
+                // Check if main select has actual merchant options (more than just placeholder)
+                const hasMerchants = options.length > 1 || options.some(opt => opt.value && opt.value !== '');
+                
+                if (hasMerchants) {
+                    newMerchantSelect.innerHTML = '<option value="">请选择</option>';
+                    options.forEach(option => {
+                        if (option.value) {
+                            const newOption = option.cloneNode(true);
+                            newMerchantSelect.appendChild(newOption);
+                        }
+                    });
+                } else {
+                    // Main select is empty, use default merchants
+                    newMerchantSelect.innerHTML = '<option value="">请选择</option>';
+                    defaultMerchants.forEach(merchant => {
+                        const option = document.createElement('option');
+                        option.value = merchant.id;
+                        option.textContent = merchant.name;
+                        newMerchantSelect.appendChild(option);
+                    });
+                }
             } else {
-                // If main form doesn't exist, try to load from mock data or API
+                // If main form doesn't exist, use default merchants
                 newMerchantSelect.innerHTML = '<option value="">请选择</option>';
-                // Add mock merchants for demo
-                const mockMerchants = [
-                    { id: 'merchant1', name: 'STARSAAS' },
-                    { id: 'merchant2', name: 'Merchant 2' }
-                ];
-                mockMerchants.forEach(merchant => {
+                defaultMerchants.forEach(merchant => {
                     const option = document.createElement('option');
                     option.value = merchant.id;
                     option.textContent = merchant.name;
@@ -2184,21 +4223,75 @@
             // Add event listener for merchant change
             newMerchantSelect.addEventListener('change', async function() {
                 const merchantId = this.value;
-                const subAccountSelect = document.getElementById('rr-subaccount');
-                
-                if (!merchantId) {
-                    subAccountSelect.innerHTML = '<option value="">请选择</option>';
-                    subAccountSelect.disabled = true;
-                    return;
-                }
+                await loadSubAccountsForRoundRobin(merchantId);
+            });
+        }
 
-                // Try to get sub-accounts from main form first
-                const mainMerchantSelect = document.getElementById('merchant-name');
-                const mainSubAccountSelect = document.getElementById('sub-account');
+        // Load Sub Accounts for Round Robin (separated for reuse)
+        async function loadSubAccountsForRoundRobin(merchantId) {
+            const subAccountSelect = document.getElementById('rr-subaccount');
+            if (!subAccountSelect) return;
+            
+            if (!merchantId) {
+                subAccountSelect.innerHTML = '<option value="">请选择</option>';
+                subAccountSelect.disabled = true;
+                return;
+            }
+            
+            // Try to load from API first (if not file:// protocol)
+            try {
+                if (window.location.protocol !== 'file:') {
+                    const response = await fetch(`/api/merchants/${merchantId}/sub-accounts`, {
+                        method: 'GET',
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.subAccounts && data.subAccounts.length > 0) {
+                            subAccountSelect.innerHTML = '<option value="">请选择</option>';
+                            data.subAccounts.forEach(subAccount => {
+                                const option = document.createElement('option');
+                                option.value = subAccount.id;
+                                option.textContent = subAccount.name;
+                                subAccountSelect.appendChild(option);
+                            });
+                            subAccountSelect.disabled = false;
+                            return;
+                        }
+                    }
+                }
+            } catch (error) {
+                console.log('Failed to load sub-accounts from API (using defaults):', error.message);
+            }
+            
+            // Try to get sub-accounts from main form if same merchant
+            // Find the select element specifically in the channel binding tab
+            const channelBindingTab = document.getElementById('channel-binding-tab');
+            let mainMerchantSelect = null;
+            if (channelBindingTab) {
+                mainMerchantSelect = channelBindingTab.querySelector('select#merchant-name');
+            }
+            // Fallback: try direct getElementById but verify it's a select
+            if (!mainMerchantSelect) {
+                const directSelect = document.getElementById('merchant-name');
+                if (directSelect && directSelect.tagName === 'SELECT') {
+                    mainMerchantSelect = directSelect;
+                }
+            }
+            const mainSubAccountSelect = document.getElementById('sub-account');
+            
+            if (mainMerchantSelect && mainSubAccountSelect && mainMerchantSelect.value === merchantId) {
+                let options = [];
+                if (mainSubAccountSelect.options) {
+                    options = Array.from(mainSubAccountSelect.options);
+                } else {
+                    options = Array.from(mainSubAccountSelect.querySelectorAll('option'));
+                }
                 
-                if (mainMerchantSelect && mainSubAccountSelect && mainMerchantSelect.value === merchantId) {
-                    // Copy from main form if same merchant is selected
-                    const options = Array.from(mainSubAccountSelect.options);
+                const hasSubAccounts = options.length > 1 || options.some(opt => opt.value && opt.value !== '');
+                
+                if (hasSubAccounts) {
                     subAccountSelect.innerHTML = '<option value="">请选择</option>';
                     options.forEach(option => {
                         if (option.value) {
@@ -2207,67 +4300,34 @@
                         }
                     });
                     subAccountSelect.disabled = false;
-                } else {
-                    // Load from API or use mock data
-                    await loadSubAccountsForRoundRobin(merchantId);
+                    return;
                 }
-            });
-        }
-
-        // Load Sub Accounts for Round Robin
-        async function loadSubAccountsForRoundRobin(merchantId) {
-            const subAccountSelect = document.getElementById('rr-subaccount');
-            
-            // Use default sub-accounts immediately (don't wait for API)
-            const defaultSubAccounts = [
-                { id: 'starsaas-001', name: 'STARSAAS-001' },
-                { id: 'starsaas-002', name: 'STARSAAS-002' },
-                { id: 'starsaas-003', name: 'STARSAAS-003' }
-            ];
-            
-            // Load defaults immediately
-            subAccountSelect.innerHTML = '<option value="">请选择</option>';
-            defaultSubAccounts.forEach(subAccount => {
-                const option = document.createElement('option');
-                option.value = subAccount.id;
-                option.textContent = subAccount.name;
-                subAccountSelect.appendChild(option);
-            });
-            subAccountSelect.disabled = false;
-            
-            // Try to load from API in background (optional)
-            try {
-                const response = await fetch(`/api/merchants/${merchantId}/sub-accounts`, {
-                    method: 'GET',
-                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                });
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.subAccounts && data.subAccounts.length > 0) {
-                        subAccountSelect.innerHTML = '<option value="">请选择</option>';
-                        data.subAccounts.forEach(subAccount => {
-                            const option = document.createElement('option');
-                            option.value = subAccount.id;
-                            option.textContent = subAccount.name;
-                            subAccountSelect.appendChild(option);
-                        });
-                        subAccountSelect.disabled = false;
-                        return;
-                    }
-                }
-            } catch (error) {
-                // Silently fail - we already have default sub-accounts loaded
-                console.log('Failed to load sub-accounts from API (using defaults):', error.message);
             }
             
-            // Fallback already loaded above, so we're done
-            const mockSubAccounts = [
-                { id: 'sub1', name: 'STARSAAS' },
-                { id: 'sub2', name: 'Sub Account 2' },
-                { id: 'sub3', name: 'Sub Account 3' }
+            // Use default sub-accounts based on merchant ID
+            const defaultSubAccounts = {
+                'starsaas': [
+                    { id: 'starsaas-001', name: 'STARSAAS-001' },
+                    { id: 'starsaas-002', name: 'STARSAAS-002' },
+                    { id: 'starsaas-003', name: 'STARSAAS-003' }
+                ],
+                'nbcpay': [
+                    { id: 'nbcpay-001', name: 'NbcPay-001' },
+                    { id: 'nbcpay-002', name: 'NbcPay-002' }
+                ],
+                'nexpay': [
+                    { id: 'nexpay-001', name: 'NexPay-001' },
+                    { id: 'nexpay-002', name: 'NexPay-002' }
+                ]
+            };
+            
+            // Load defaults immediately based on merchant
+            subAccountSelect.innerHTML = '<option value="">请选择</option>';
+            const subAccounts = defaultSubAccounts[merchantId] || [
+                { id: 'default-001', name: 'Default-001' }
             ];
-            mockSubAccounts.forEach(subAccount => {
+            
+            subAccounts.forEach(subAccount => {
                 const option = document.createElement('option');
                 option.value = subAccount.id;
                 option.textContent = subAccount.name;
@@ -4586,6 +6646,15 @@
         // Load summary data from API
         async function loadSummaryData() {
             try {
+                // Check if we're running from file:// protocol (local file)
+                if (window.location.protocol === 'file:') {
+                    console.warn('Running from file:// protocol, using mock data');
+                    summaryData = getMockSummaryData();
+                    filteredData = [...summaryData];
+                    renderSummaryTable();
+                    return;
+                }
+                
                 const response = await fetch('/api/channel-binding/list', {
                     method: 'GET',
                     headers: {

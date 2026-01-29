@@ -41,6 +41,11 @@
     height: 24px;
 }
 
+/* Hidden until "Restore AI agent chat button" – remove this block to show the chat icon again */
+.foundry-chat-icon {
+    display: none !important;
+}
+
 .foundry-chat-window {
     position: fixed;
     bottom: 100px;
